@@ -26,15 +26,5 @@ namespace PlatformIndependenceLayer
         /// Returns true if the current platform is FreeBSD, otherwise returns false.
         /// </summary>
         public static bool IsFreeBSD => RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD);
-
-        /// <summary>
-        /// Returns true if the current platform is Android, otherwise returns false.
-        /// </summary>
-        public static bool IsAndroid => RuntimeInformation.IsOSPlatform(OSPlatform.Create("ANDROID"));
-
-        /// <summary>
-        /// Returns true if the current platform is iOS, otherwise returns false.
-        /// </summary>
-        public static bool IsIOS => RuntimeInformation.IsOSPlatform(OSPlatform.Create("IOS"));
     }
 }

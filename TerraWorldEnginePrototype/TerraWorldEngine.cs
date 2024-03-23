@@ -1,5 +1,5 @@
 ﻿using CoreEnginePrototype;
-using OpenTK.Graphics.OpenGL;
+using PlatformIndependenceLayer.Rendering.WindowManager.WinWnd;
 
 namespace TerraWorldEnginePrototype
 {
@@ -7,10 +7,9 @@ namespace TerraWorldEnginePrototype
     {
         public static void Main()
         {
-            if (true)
-            {
-                Console.WriteLine("Windows");
-            }
+            StartUpAndShutDuwnModule.StartUp();
+
+            StartUpAndShutDuwnModule.ShutDown();
         }
     }
 }

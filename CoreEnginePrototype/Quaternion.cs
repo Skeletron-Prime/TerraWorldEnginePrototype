@@ -160,6 +160,16 @@ namespace CoreEnginePrototype
         }
 
         /// <summary>
+        /// Returns the string representation of the given quaternion.
+        /// </summary>
+        /// <param name="quaternion">The quaternion, out which the string will be built.</param>
+        /// <returns>The string representation of the quaternion, as w, x, y and z string.</returns>
+        public static string ToString(Quaternion quaternion)
+        {
+            return quaternion.ToString();
+        }
+
+        /// <summary>
         /// Normalizes the quaternion. The normalized quaternion is a quaternion with the same rotation as the original quaternion, but with a magnitude of 1.
         /// </summary>
         /// <returns>The normalized quaternion.</returns>
