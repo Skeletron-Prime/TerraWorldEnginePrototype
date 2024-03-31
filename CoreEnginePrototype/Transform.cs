@@ -1,4 +1,6 @@
-﻿namespace CoreEnginePrototype
+﻿using CoreEnginePrototype.Mathematics;
+
+namespace CoreEnginePrototype
 {
     public class Transform : Component
     {

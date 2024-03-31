@@ -1,5 +1,4 @@
 ﻿using CoreEnginePrototype;
-using PlatformIndependenceLayer.Rendering.WindowManager.WinWnd;
 
 namespace TerraWorldEnginePrototype
 {

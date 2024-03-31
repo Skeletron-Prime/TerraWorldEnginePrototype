@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace CoreEnginePrototype
+namespace CoreEnginePrototype.Mathematics
 {
     /// <summary>
     /// Represents a 3D vector with x, y and z components, to represent the location in 3D space.

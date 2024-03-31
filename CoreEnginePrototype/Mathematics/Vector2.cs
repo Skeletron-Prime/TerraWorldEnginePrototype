@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace CoreEnginePrototype
+namespace CoreEnginePrototype.Mathematics
 {
     /// <summary>
     /// Represents a 2D vector, that includes x and y components, to represent the location in 2D space.
@@ -51,7 +51,7 @@ namespace CoreEnginePrototype
         /// A vector with all of its components set to positive infinity.
         /// </summary>
         public static Vector2 Infinity => new(float.PositiveInfinity, float.PositiveInfinity);
-        
+
         /// <summary>
         /// A vector with all of its components set to negative infinity.
         /// </summary>

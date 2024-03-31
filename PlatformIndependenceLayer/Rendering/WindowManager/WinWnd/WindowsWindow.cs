@@ -19,7 +19,7 @@ namespace PlatformIndependenceLayer.Rendering.WindowManager.WinWnd
 
         nint hwnd;
 
-        internal override bool IsVisible => isVisible;
+        public override bool IsVisible => isVisible;
 
         internal nint hdc;
         bool isVisible = true;
@@ -39,7 +39,7 @@ namespace PlatformIndependenceLayer.Rendering.WindowManager.WinWnd
 
             RegisterClass(ref wc);
 
-            hwnd = CreateWindowEx(WS_EX_APPWINDOW, wc.lpszClassName, windowSettings.Title, WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX, 100, 100, windowSettings.Width, windowSettings.Height, nint.Zero, nint.Zero, wc.hInstance, nint.Zero);
+            hwnd = CreateWindowEx(WS_EX_APPWINDOW, wc.lpszClassName, windowSettings.Title, WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX, windowSettings.XLocation, windowSettings.YLocation, windowSettings.Width, windowSettings.Height, nint.Zero, nint.Zero, wc.hInstance, nint.Zero);
 
             hdc = GetDC(hwnd);
 
@@ -60,13 +60,13 @@ namespace PlatformIndependenceLayer.Rendering.WindowManager.WinWnd
             wGL = new WGL(this);
         }
 
-        internal override void Show()
+        public override void Show()
         {
             ShowWindow(hwnd, SW_SHOWNORMAL);
             UpdateWindow(hwnd);
         }
 
-        internal override void PoolEvents()
+        public override void PoolEvents()
         {
             while (PeekMessage(out MSG msg, nint.Zero, 0, 0, 1))
             {
@@ -75,12 +75,12 @@ namespace PlatformIndependenceLayer.Rendering.WindowManager.WinWnd
             }
         }
 
-        internal override void SwapBuffers()
+        public override void SwapBuffers()
         {
             _ = SwapBuffers(hdc);
         }
 
-        internal override void Dispose()
+        public override void Dispose()
         {
             wGL.Dispose();
             DestroyWindow(hwnd);

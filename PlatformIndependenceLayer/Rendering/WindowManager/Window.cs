@@ -16,17 +16,17 @@ namespace PlatformIndependenceLayer.Rendering.WindowManager
             }
         }
 
-        internal abstract void Show();
+        public abstract void Show();
 
         /// <summary>
         /// Pools for window events.
         /// </summary>
-        internal abstract void PoolEvents();
+        public abstract void PoolEvents();
 
-        internal abstract void SwapBuffers();
+        public abstract void SwapBuffers();
 
-        internal abstract void Dispose();
+        public abstract void Dispose();
 
-        internal abstract bool IsVisible { get; }
+        public abstract bool IsVisible { get; }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace CoreEnginePrototype
+﻿namespace CoreEnginePrototype.Mathematics
 {
     /// <summary>
     /// Provides constants and static methods for trigonometric, logarithmic, and other common mathematical functions.
@@ -127,7 +127,7 @@
                 throw new ArgumentException("Min value is greater than Max value!");
             }
 
-            return value < min ? min : (value > max ? max : value);
+            return value < min ? min : value > max ? max : value;
         }
     }
 }

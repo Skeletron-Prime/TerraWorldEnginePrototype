@@ -1,4 +1,5 @@
-﻿using PlatformIndependenceLayer;
+﻿using PlatformIndependenceLayer.Rendering;
+using PlatformIndependenceLayer.Rendering.WindowManager;
 
 namespace CoreEnginePrototype
 {
@@ -7,14 +8,27 @@ namespace CoreEnginePrototype
     /// </summary>
     public class StartUpAndShutDuwnModule : Object
     {
+        static Window? window;
+
         public static void StartUp()
         {
+            window = Window.Create(new WindowSettings());
 
+            window.Show();
+
+            while (window.IsVisible)
+            {
+                window.PoolEvents();
+
+                window.SwapBuffers();
+
+                window.SwapBuffers();
+            }
         }
 
         public static void ShutDown()
         {
-            // ShutDown the engine.
+            window!.Dispose();
         }
     }
 
