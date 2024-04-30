@@ -21,8 +21,6 @@ namespace CoreEnginePrototype
                 window.PoolEvents();
 
                 window.SwapBuffers();
-
-                window.SwapBuffers();
             }
         }
 

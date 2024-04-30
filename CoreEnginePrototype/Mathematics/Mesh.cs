@@ -1,4 +1,6 @@
-﻿namespace CoreEnginePrototype.Mathematics
+﻿using System.Numerics;
+
+namespace CoreEnginePrototype.Mathematics
 {
     public struct Mesh
     {

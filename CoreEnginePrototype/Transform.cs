@@ -1,4 +1,4 @@
-﻿using CoreEnginePrototype.Mathematics;
+﻿using System.Numerics;
 
 namespace CoreEnginePrototype
 {
