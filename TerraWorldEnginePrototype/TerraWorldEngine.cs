@@ -1,4 +1,4 @@
-﻿using CoreEnginePrototype;
+﻿using TerraWorldEnginePrototype.Core;
 
 namespace TerraWorldEnginePrototype
 {

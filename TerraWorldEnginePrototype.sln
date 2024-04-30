@@ -3,17 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34309.116
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreEnginePrototype", "CoreEnginePrototype\CoreEnginePrototype.csproj", "{0956A2E1-5D98-4C15-B087-0341808D5C6D}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Physics", "Physics\Physics.csproj", "{83F8F84D-E51C-4497-B035-2446AE4D54EC}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TerraWorldEnginePrototype", "TerraWorldEnginePrototype\TerraWorldEnginePrototype.csproj", "{C71D1D00-C533-42A4-A31B-056492B077E6}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThirdPartySDKs", "ThirdPartySDKs\ThirdPartySDKs.csproj", "{1776F13B-1C28-426D-AB6A-A291FF9C1E5B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Resources", "Resources\Resources.csproj", "{FB69B50B-8D55-4AE8-88B4-169640944FB3}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlatformIndependenceLayer", "PlatformIndependenceLayer\PlatformIndependenceLayer.csproj", "{4A57E0B5-B424-40C2-A697-BB30D88732AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,30 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0956A2E1-5D98-4C15-B087-0341808D5C6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0956A2E1-5D98-4C15-B087-0341808D5C6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0956A2E1-5D98-4C15-B087-0341808D5C6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0956A2E1-5D98-4C15-B087-0341808D5C6D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{83F8F84D-E51C-4497-B035-2446AE4D54EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{83F8F84D-E51C-4497-B035-2446AE4D54EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{83F8F84D-E51C-4497-B035-2446AE4D54EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{83F8F84D-E51C-4497-B035-2446AE4D54EC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C71D1D00-C533-42A4-A31B-056492B077E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C71D1D00-C533-42A4-A31B-056492B077E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C71D1D00-C533-42A4-A31B-056492B077E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C71D1D00-C533-42A4-A31B-056492B077E6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1776F13B-1C28-426D-AB6A-A291FF9C1E5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1776F13B-1C28-426D-AB6A-A291FF9C1E5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1776F13B-1C28-426D-AB6A-A291FF9C1E5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1776F13B-1C28-426D-AB6A-A291FF9C1E5B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FB69B50B-8D55-4AE8-88B4-169640944FB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FB69B50B-8D55-4AE8-88B4-169640944FB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FB69B50B-8D55-4AE8-88B4-169640944FB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FB69B50B-8D55-4AE8-88B4-169640944FB3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4A57E0B5-B424-40C2-A697-BB30D88732AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4A57E0B5-B424-40C2-A697-BB30D88732AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4A57E0B5-B424-40C2-A697-BB30D88732AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4A57E0B5-B424-40C2-A697-BB30D88732AF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
