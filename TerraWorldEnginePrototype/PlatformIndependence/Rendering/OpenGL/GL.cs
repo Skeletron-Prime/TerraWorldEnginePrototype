@@ -1,8 +1,12 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
+using TerraWorldEnginePrototype.PlatformIndependence.Rendering.Primitives;
 
-namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering
+namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 {
+    /// <summary>
+    /// Represents the OpenGL API. This class is a wrapper around the OpenGL API functions. Contains all OpenGL functions, that are used in the project.
+    /// </summary>
     internal static class GL
     {
         #region Initialization
@@ -102,7 +106,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering
 
         #region Bind Buffer
 
-        delegate void BindBufferDelegate(uint target, int buffer);
+        delegate void BindBufferDelegate(uint target, uint buffer);
         static readonly BindBufferDelegate glBindBuffer;
 
         /// <summary>
@@ -112,7 +116,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering
         /// </summary>
         /// <param name="target">The target to which the buffer object is bound</param>
         /// <param name="buffer">The buffer object to bind</param>
-        internal static void BindBuffer(BufferTarget target, int buffer)
+        internal static void BindBuffer(BufferTarget target, uint buffer)
         {
             glBindBuffer((uint)target, buffer);
             CheckErrors();
@@ -148,12 +152,17 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering
 
         #region Buffer Data
 
-        delegate void BufferDataDelegate(uint target, int size, float[] data, uint usage);
+        unsafe delegate void BufferDataDelegate(uint target, int size, void* data, uint usage);
         static readonly BufferDataDelegate glBufferData;
 
-        internal static void BufferData(BufferTarget target, int size, float[] data, BufferUsage usage)
+        public unsafe static void BufferData<T>(BufferTarget target, T[] data, BufferUsage usage) where T : unmanaged
         {
-            glBufferData((uint)target, size, data, (uint)usage);
+            var size = data.Length * sizeof(T);
+
+            fixed (T* dataPtr = data)
+            {
+                glBufferData((uint)target, size, dataPtr, (uint)usage);
+            }
             CheckErrors();
         }
 
@@ -239,14 +248,14 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering
 
         #endregion
 
-        #region Delete Buffers
+        #region Delete Buffer
 
-        delegate void DeleteBuffersDelegate(int n, ref int buffers);
+        delegate void DeleteBuffersDelegate(int n, ref uint buffers);
         static readonly DeleteBuffersDelegate glDeleteBuffers;
 
-        internal static void DeleteBuffers(int n, ref int buffers)
+        public static void DeleteBuffer(uint buffer)
         {
-            glDeleteBuffers(n, ref buffers);
+            glDeleteBuffers(1, ref buffer);
             CheckErrors();
         }
 
@@ -296,9 +305,9 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering
         delegate void DrawElementsDelegate(uint mode, int count, uint type, int indices);
         static readonly DrawElementsDelegate glDrawElements;
 
-        internal static void DrawElements(DrawMode mode, int count, uint type, int indices)
+        public static void DrawElements(DrawMode mode, int count, DataType type, int indices)
         {
-            glDrawElements((uint)mode, count, type, indices);
+            glDrawElements((uint)mode, count, (uint)type, indices);
             CheckErrors();
         }
 
@@ -330,47 +339,52 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering
 
         #endregion
 
-        #region Gen Buffers
+        #region Gen Buffer
 
-        delegate void GenBuffersDelegate(int n, ref int buffers);
-        static GenBuffersDelegate glGenBuffers;
+        delegate void GenBuffersDelegate(int n, ref uint buffers);
+        static readonly GenBuffersDelegate glGenBuffers;
 
         /// <summary>
-        /// Generates buffer object names. This function in itself does not
+        /// Generates buffer object name. This function in itself does not
         /// create any buffer but rather helps to find an unused name for a new buffer object.
         /// </summary>
-        /// <param name="n">The number of buffer object names to generate</param>
-        /// <param name="buffers">Array in which the generated buffer object names are stored</param>
-        internal static void GenBuffers(int n, ref int buffers)
+        /// <returns>The name of the buffer object</returns>
+        public static uint GenBuffer()
         {
-            glGenBuffers(n, ref buffers);
+            uint buffer = 0;
+            glGenBuffers(1, ref buffer);
             CheckErrors();
+            return buffer;
         }
 
         #endregion
 
-        #region Gen Textures
+        #region Gen Texture
 
         delegate void GenTexturesDelegate(int n, ref uint textures);
         static readonly GenTexturesDelegate glGenTextures;
 
-        internal static void GenTextures(int n, ref uint textures)
+        internal static uint GenTexture()
         {
-            glGenTextures(n, ref textures);
+            uint texture = 0;
+            glGenTextures(1, ref texture);
             CheckErrors();
+            return texture;
         }
 
         #endregion
 
-        #region Gen Vertex Arrays
+        #region Gen Vertex Array
 
         delegate void GenVertexArraysDelegate(int n, ref uint arrays);
         static readonly GenVertexArraysDelegate glGenVertexArrays;
 
-        internal static void GenVertexArrays(int n, ref uint arrays)
+        public static uint GenVertexArray()
         {
-            glGenVertexArrays(n, ref arrays);
+            uint array = 0;
+            glGenVertexArrays(1, ref array);
             CheckErrors();
+            return array;
         }
 
         #endregion
@@ -615,137 +629,4 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering
 
         #endregion
     }
-}
-
-internal enum ClearBufferMask : uint
-{
-    DepthBufferBit = 0x00000100,
-    StencilBufferBit = 0x00000400,
-    ColorBufferBit = 0x00004000,
-}
-
-internal enum ShaderType : uint
-{
-    FragmentShader = 0x8B30,
-    VertexShader = 0x8B31,
-}
-
-internal enum BufferTarget : uint
-{
-    ArrayBuffer = 0x8892,
-    ElementArrayBuffer = 0x8893
-}
-
-internal enum CullFaceMode : uint
-{
-    Back = 0x0405
-}
-
-internal enum ErrorCode : uint
-{
-    NoError = 0,
-    InvalidEnum = 0x0500,
-    InvalidValue = 0x0501,
-    InvalidOperation = 0x0502,
-    StackOverflow = 0x0503,
-    StackUnderflow = 0x0504,
-    OutOfMemory = 0x0505
-}
-
-internal enum DataType : uint
-{
-    Float = 0x1406,
-}
-
-internal enum ParameterName : uint
-{
-    CompileStatus = 0x8B81,
-    LinkStatus = 0x8B82,
-}
-
-internal enum BufferUsage : uint
-{
-    StaticDraw = 0x88E4
-}
-
-internal enum DrawMode : uint
-{
-    Triangles = 0x0004
-}
-
-internal enum TextureTarget : uint
-{
-    Texture1D = 0x0DE0,
-    Texture2D = 0x0DE1,
-    Texture3D = 0x806F,
-    TextureCubeMap = 0x8513
-}
-
-internal enum TextureParameterName : uint
-{
-    TextureMinFilter = 0x2801,
-    TextureMagFilter = 0x2800,
-    TextureWrapS = 0x2802,
-    TextureWrapT = 0x2803,
-    TextureWrapR = 0x8072
-}
-
-internal enum TextureMinFilter : uint
-{
-    Nearest = 0x2600,
-    Linear = 0x2601,
-    NearestMipmapNearest = 0x2700,
-    LinearMipmapNearest = 0x2701,
-    NearestMipmapLinear = 0x2702,
-    LinearMipmapLinear = 0x2703
-}
-
-internal enum TextureMagFilter : uint
-{
-    Nearest = 0x2600,
-    Linear = 0x2601
-}
-
-internal enum TextureWrapMode : uint
-{
-    ClampToEdge = 0x812F,
-    ClampToBorder = 0x812D,
-    MirroredRepeat = 0x8370,
-    Repeat = 0x2901
-}
-
-internal enum TextureUnit : uint
-{
-    Texture0 = 0x84C0,
-    Texture1 = 0x84C1,
-    Texture2 = 0x84C2,
-    Texture3 = 0x84C3,
-    Texture4 = 0x84C4,
-    Texture5 = 0x84C5,
-    Texture6 = 0x84C6,
-    Texture7 = 0x84C7,
-    Texture8 = 0x84C8,
-    Texture9 = 0x84C9,
-    Texture10 = 0x84CA,
-    Texture11 = 0x84CB,
-    Texture12 = 0x84CC,
-    Texture13 = 0x84CD,
-    Texture14 = 0x84CE,
-    Texture15 = 0x84CF,
-    Texture16 = 0x84D0,
-    Texture17 = 0x84D1,
-    Texture18 = 0x84D2,
-    Texture19 = 0x84D3,
-    Texture20 = 0x84D4,
-    Texture21 = 0x84D5,
-    Texture22 = 0x84D6,
-    Texture23 = 0x84D7,
-    Texture24 = 0x84D8,
-    Texture25 = 0x84D9,
-    Texture26 = 0x84DA,
-    Texture27 = 0x84DB,
-    Texture28 = 0x84DC,
-    Texture29 = 0x84DD,
-    Texture30 = 0x84DE,
-    Texture31 = 0x84DF
 }
