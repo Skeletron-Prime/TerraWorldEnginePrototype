@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL;
 using TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager;
 
 namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager.WinWnd
@@ -25,14 +26,18 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
         internal nint hdc;
         bool isVisible = true;
 
-        WGL wGL;
+        GraphicsDevice graphicsDevice;
+
+        private readonly WndProc windowProcDelegate;
 
         public WindowsWindow(WindowSettings windowSettings)
         {
+            windowProcDelegate = WindowProc;
+
             WNDCLASS wc = new WNDCLASS
             {
                 style = CS_HREDRAW | CS_VREDRAW,
-                lpfnWndProc = Marshal.GetFunctionPointerForDelegate((WndProc)WindowProc),
+                lpfnWndProc = Marshal.GetFunctionPointerForDelegate(windowProcDelegate),
                 hInstance = Marshal.GetHINSTANCE(typeof(WindowsWindow).Module),
                 hbrBackground = nint.Zero,
                 lpszClassName = windowSettings.Title
@@ -58,7 +63,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
             int iPixelFormat = ChoosePixelFormat(hdc, ref pfd);
             SetPixelFormat(hdc, iPixelFormat, ref pfd);
 
-            wGL = new WGL(this);
+            graphicsDevice = new GLGraphicsDevice(this);
         }
 
         public override void Show()
@@ -83,7 +88,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
 
         public override void Dispose()
         {
-            wGL.Dispose();
+            graphicsDevice.Dispose();
             DestroyWindow(hwnd);
         }
 

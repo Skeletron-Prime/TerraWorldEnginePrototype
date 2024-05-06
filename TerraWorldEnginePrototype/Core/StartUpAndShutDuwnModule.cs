@@ -28,19 +28,4 @@ namespace TerraWorldEnginePrototype.Core
             window!.Dispose();
         }
     }
-
-    public class Config : Object
-    {
-        public Config()
-        {
-        }
-
-        public void Configurate()
-        {
-        }
-
-        public void Save()
-        {
-        }
-    }
 }

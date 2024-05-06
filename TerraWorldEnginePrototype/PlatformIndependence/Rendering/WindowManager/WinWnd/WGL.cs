@@ -4,12 +4,17 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
 {
     internal class WGL
     {
-        internal WGL(WindowsWindow window)
+        internal WGL(Window window)
         {
-            this.window = window;
+            this.window = window as WindowsWindow;
 
-            hglrc = wglCreateContext(window.hdc);
-            wglMakeCurrent(window.hdc, hglrc);
+            if (this.window == null)
+            {
+                throw new Exception("Windows only!");
+            }
+
+            hglrc = wglCreateContext(this.window.hdc);
+            wglMakeCurrent(this.window.hdc, hglrc);
 
             wglSwapIntervalEXT = Marshal.GetDelegateForFunctionPointer<wglExtSwapInterval>(wglGetProcAddress("wglSwapIntervalEXT"));
 
