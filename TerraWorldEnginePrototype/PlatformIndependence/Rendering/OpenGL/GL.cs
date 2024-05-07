@@ -168,6 +168,24 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 
         #endregion
 
+        #region Buffer Sub Data
+
+        unsafe delegate void BufferSubDataDelegate(uint target, int offset, int size, void* data);
+        static readonly BufferSubDataDelegate glBufferSubData;
+
+        public unsafe static void BufferSubData<T>(BufferTarget target, int offset, T[] data) where T : unmanaged
+        {
+            var size = data.Length * sizeof(T);
+
+            fixed (T* dataPtr = data)
+            {
+                glBufferSubData((uint)target, offset, size, dataPtr);
+            }
+            CheckErrors();
+        }
+
+        #endregion
+
         #region Clear
 
         delegate void ClearDelegate(uint mask);
@@ -261,6 +279,19 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 
         #endregion
 
+        #region Delete Program
+
+        delegate void DeleteProgramDelegate(uint program);
+        static readonly DeleteProgramDelegate glDeleteProgram;
+
+        internal static void DeleteProgram(uint program)
+        {
+            glDeleteProgram(program);
+            CheckErrors();
+        }
+
+        #endregion
+
         #region Delete Shader
 
         delegate void DeleteShaderDelegate(uint shader);
@@ -282,6 +313,19 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         internal static void DeleteTextures(int n, ref uint textures)
         {
             glDeleteTextures(n, ref textures);
+            CheckErrors();
+        }
+
+        #endregion
+
+        #region Delete Vertex Array
+
+        delegate void DeleteVertexArraysDelegate(int n, ref uint arrays);
+        static readonly DeleteVertexArraysDelegate glDeleteVertexArrays;
+
+        public static void DeleteVertexArray(uint array)
+        {
+            glDeleteVertexArrays(1, ref array);
             CheckErrors();
         }
 
@@ -407,7 +451,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         delegate void GetProgramivDelegate(uint program, uint pname, out bool success);
         static readonly GetProgramivDelegate glGetProgramiv;
 
-        internal static void GetProgramiv(uint program, ParameterName pname, out bool success)
+        internal static void GetProgramiv(uint program, ShaderParameterName pname, out bool success)
         {
             glGetProgramiv(program, (uint)pname, out success);
             CheckErrors();
@@ -433,7 +477,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         delegate void GetShaderivDelegate(uint shader, uint pname, out bool success);
         static readonly GetShaderivDelegate glGetShaderiv;
 
-        internal static void GetShaderiv(uint shader, ParameterName pname, out bool success)
+        internal static void GetShaderiv(uint shader, ShaderParameterName pname, out bool success)
         {
             glGetShaderiv(shader, (uint)pname, out success);
             CheckErrors();
@@ -473,9 +517,9 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         delegate void ShaderSourceDelegate(uint shader, int count, string[] source, int[] length);
         static readonly ShaderSourceDelegate glShaderSource;
 
-        internal static void ShaderSource(uint shader, int count, string[] source, int[] length)
+        internal static void ShaderSource(uint shader, string source)
         {
-            glShaderSource(shader, count, source, length);
+            glShaderSource(shader, 1, [source], [source.Length]);
             CheckErrors();
         }
 
