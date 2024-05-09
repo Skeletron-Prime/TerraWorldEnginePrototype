@@ -1,6 +1,6 @@
 ﻿namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.Primitives
 {
-    internal enum TextureParameterName : uint
+    public enum TextureParameterName : uint
     {
         TextureMinFilter = 0x2801,
         TextureMagFilter = 0x2800,

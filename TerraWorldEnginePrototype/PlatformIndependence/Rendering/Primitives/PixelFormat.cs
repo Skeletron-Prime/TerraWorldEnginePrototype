@@ -1,8 +1,8 @@
 ﻿namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.Primitives
 {
-    public enum BufferUsage : uint
+    public enum PixelFormat : uint
     {
-        StaticDraw = 0x88E4,
-        DynamicDraw = 0x88E8,
+        Rgb = 0x1907,
+        Rgba = 0x1908
     }
 }

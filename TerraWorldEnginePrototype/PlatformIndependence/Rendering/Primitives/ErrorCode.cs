@@ -1,6 +1,6 @@
 ﻿namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.Primitives
 {
-    internal enum ErrorCode : uint
+    public enum ErrorCode : uint
     {
         NoError = 0,
         InvalidEnum = 0x0500,

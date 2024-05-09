@@ -1,6 +1,6 @@
 ﻿namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.Primitives
 {
-    internal enum TextureWrapMode : uint
+    public enum TextureWrapMode : uint
     {
         ClampToEdge = 0x812F,
         ClampToBorder = 0x812D,

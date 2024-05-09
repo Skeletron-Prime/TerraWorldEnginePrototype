@@ -5,16 +5,14 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
     public class GLBuffer<T> : GraphicsBuffer 
         where T : unmanaged
     {
-        private readonly uint id;
         private readonly BufferTarget target;
-        private bool isDisposed;
 
-        public uint ID => id;
-        protected override bool IsDisposed => isDisposed;
+        public uint ID { get; private set; }
+        public override bool IsDisposed { get; protected set; }
 
         internal GLBuffer(BufferTarget target)
         {
-            id = GL.GenBuffer();
+            ID = GL.GenBuffer();
             this.target = target;
 
             Bind();
@@ -29,15 +27,15 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 
         public void Bind()
         {
-            GL.BindBuffer(target, id);
+            GL.BindBuffer(target, ID);
         }
 
         public override void Dispose()
         {
-            if (!isDisposed)
+            if (!IsDisposed)
             {
-                GL.DeleteBuffer(id);
-                isDisposed = true;
+                GL.DeleteBuffer(ID);
+                IsDisposed = true;
             }
         }
     }

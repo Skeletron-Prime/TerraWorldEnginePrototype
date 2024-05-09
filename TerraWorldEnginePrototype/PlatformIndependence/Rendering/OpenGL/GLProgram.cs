@@ -4,32 +4,29 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 {
     internal class GLProgram : GraphicsProgram
     {
-        private uint id;
-        private bool isDisposed;
-
-        internal uint ID => id;
-        protected override bool IsDisposed => isDisposed;
+        internal uint ID { get; private set; }
+        public override bool IsDisposed { get; protected set; }
 
         internal GLProgram(Dictionary<ShaderType, string> shadersources)
         {
             GLShader[] shaders = new GLShader[shadersources.Count];
 
-            id = GL.CreateProgram();
+            ID = GL.CreateProgram();
 
             for (int i = 0; i < shadersources.Count; i++)
             {
-                GLShader shader = new GLShader(shadersources.ElementAt(i).Key, shadersources.ElementAt(i).Value);
+                shaders[i] = new GLShader(shadersources.ElementAt(i).Key, shadersources.ElementAt(i).Value);
 
-                GL.AttachShader(id, shader.ID);
+                GL.AttachShader(ID, shaders[i].ID);
             }
 
-            GL.LinkProgram(id);
+            GL.LinkProgram(ID);
 
-            GL.GetProgramiv(id, ShaderParameterName.LinkStatus, out bool success);
+            GL.GetProgramiv(ID, ShaderParameterName.LinkStatus, out bool success);
             if (!success)
             {
                 byte[] infoLog = new byte[512];
-                GL.GetProgramInfoLog(id, 512, out _, infoLog);
+                GL.GetProgramInfoLog(ID, 512, out _, infoLog);
                 Console.WriteLine($"ERROR::SHADER::PROGRAM::LINKING_FAILED\n{infoLog}");
             }
 
@@ -38,15 +35,15 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
                 shader.Dispose();
             }
 
-            GL.UseProgram(id);
+            GL.UseProgram(ID);
         }
 
         public override void Dispose()
         {
-            if (!isDisposed)
+            if (!IsDisposed)
             {
-                GL.DeleteProgram(id);
-                isDisposed = true;
+                GL.DeleteProgram(ID);
+                IsDisposed = true;
             }
         }
     }

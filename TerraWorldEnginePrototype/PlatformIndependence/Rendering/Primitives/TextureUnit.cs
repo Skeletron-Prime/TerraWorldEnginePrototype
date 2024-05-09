@@ -1,6 +1,6 @@
 ﻿namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.Primitives
 {
-    internal enum TextureUnit : uint
+    public enum TextureUnit : uint
     {
         Texture0 = 0x84C0,
         Texture1 = 0x84C1,

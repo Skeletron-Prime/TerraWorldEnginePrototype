@@ -63,7 +63,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
             int iPixelFormat = ChoosePixelFormat(hdc, ref pfd);
             SetPixelFormat(hdc, iPixelFormat, ref pfd);
 
-            graphicsDevice = new GLGraphicsDevice(this);
+            graphicsDevice = new GLDevice(this);
         }
 
         public override void Show()

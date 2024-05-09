@@ -2,30 +2,27 @@
 {
     public class GLVertexArray : GraphicsVertexArray
     {
-        private readonly uint id;
-        private bool isDisposed;
-
-        public uint ID => id;
-        protected override bool IsDisposed => isDisposed;
+        public uint ID { get; private set; }
+        public override bool IsDisposed { get; protected set; }
 
         public GLVertexArray()
         {
-            id = GL.GenVertexArray();
+            ID = GL.GenVertexArray();
 
             Bind();
         }
 
         public void Bind()
         {
-            GL.BindVertexArray(id);
+            GL.BindVertexArray(ID);
         }
 
         public override void Dispose()
         {
-            if (!isDisposed)
+            if (!IsDisposed)
             {
-                GL.DeleteVertexArray(id);
-                isDisposed = true;
+                GL.DeleteVertexArray(ID);
+                IsDisposed = true;
             }
         }
     }

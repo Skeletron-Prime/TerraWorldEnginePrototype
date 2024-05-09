@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using TerraWorldEnginePrototype.PlatformIndependence.Rendering.Primitives;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 {
@@ -18,6 +20,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             LoadFunction(out glClear, nameof(glClear));
             LoadFunction(out glBindBuffer, nameof(glBindBuffer));
             LoadFunction(out glBindTexture, nameof(glBindTexture));
+            LoadFunction(out glActiveTexture, nameof(glActiveTexture));
             LoadFunction(out glAttachShader, nameof(glAttachShader));
             LoadFunction(out glBindVertexArray, nameof(glBindVertexArray));
             LoadFunction(out glBufferData, nameof(glBufferData));
@@ -33,8 +36,10 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             LoadFunction(out glEnableVertexAttribArray, nameof(glEnableVertexAttribArray));
             LoadFunction(out glFlush, nameof(glFlush));
             LoadFunction(out glGenBuffers, nameof(glGenBuffers));
+            LoadFunction(out glGenerateMipmap, nameof(glGenerateMipmap));
             LoadFunction(out glGenTextures, nameof(glGenTextures));
             LoadFunction(out glGenVertexArrays, nameof(glGenVertexArrays));
+            LoadFunction(out glGetAttribLocation, nameof(glGetAttribLocation));
             LoadFunction(out glGetProgramInfoLog, nameof(glGetProgramInfoLog));
             LoadFunction(out glGetProgramiv, nameof(glGetProgramiv));
             LoadFunction(out glGetShaderInfoLog, nameof(glGetShaderInfoLog));
@@ -91,6 +96,19 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 
         #endregion
 
+        #region Active Texture
+
+        delegate void ActiveTextureDelegate(uint texture);
+        static readonly ActiveTextureDelegate glActiveTexture;
+
+        internal static void ActiveTexture(TextureUnit texture)
+        {
+            glActiveTexture((uint)texture);
+            CheckErrors();
+        }
+
+        #endregion
+
         #region Attach Shader
 
         delegate void AttachShaderDelegate(uint program, uint shader);
@@ -129,7 +147,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         delegate void BindTextureDelegate(uint target, uint texture);
         static readonly BindTextureDelegate glBindTexture;
 
-        internal static void BindTexture(TextureTarget target, uint texture)
+        internal static void BindTexture(TextureType target, uint texture)
         {
             glBindTexture((uint)target, texture);
             CheckErrors();
@@ -310,9 +328,9 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         delegate void DeleteTexturesDelegate(int n, ref uint textures);
         static readonly DeleteTexturesDelegate glDeleteTextures;
 
-        internal static void DeleteTextures(int n, ref uint textures)
+        internal static void DeleteTexture(uint texture)
         {
-            glDeleteTextures(n, ref textures);
+            glDeleteTextures(1, ref texture);
             CheckErrors();
         }
 
@@ -403,6 +421,19 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 
         #endregion
 
+        #region Gen Mipmap
+
+        delegate void GenerateMipmapDelegate(uint target);
+        static readonly GenerateMipmapDelegate glGenerateMipmap;
+
+        internal static void GenerateMipmap(TextureType target)
+        {
+            glGenerateMipmap((uint)target);
+            CheckErrors();
+        }
+
+        #endregion
+
         #region Gen Texture
 
         delegate void GenTexturesDelegate(int n, ref uint textures);
@@ -429,6 +460,20 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             glGenVertexArrays(1, ref array);
             CheckErrors();
             return array;
+        }
+
+        #endregion
+
+        #region Get Attribute Location
+
+        delegate int GetAttribLocationDelegate(uint program, string name);
+        static readonly GetAttribLocationDelegate glGetAttribLocation;
+
+        internal static int GetAttribLocation(uint program, string name)
+        {
+            var location = glGetAttribLocation(program, name);
+            CheckErrors();
+            return location;
         }
 
         #endregion
@@ -527,12 +572,15 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 
         #region Texture Image 2D
 
-        delegate void TexImage2DDelegate(uint target, int level, int internalFormat, int width, int height, int border, uint format, uint type, float[] pixels);
+        unsafe delegate void TexImage2DDelegate(uint target, int level, int internalFormat, int width, int height, int border, uint format, uint type, void* pixels);
         static readonly TexImage2DDelegate glTexImage2D;
 
-        internal static void TexImage2D(TextureTarget target, int level, int internalFormat, int width, int height, int border, uint format, uint type, float[] pixels)
+        internal unsafe static void TexImage2D<T>(TextureType target, int level, PixelInternalFormat internalFormat, int width, int height, int border, PixelFormat format, PixelType type, T[] pixels) where T : unmanaged
         {
-            glTexImage2D((uint)target, level, internalFormat, width, height, border, format, type, pixels);
+            fixed (T* pixelsPtr = pixels)
+            {
+                glTexImage2D((uint)target, level, (int)internalFormat, width, height, border, (uint)format, (uint)type, pixelsPtr);
+            }
             CheckErrors();
         }
 
@@ -543,7 +591,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         delegate void TexImage3DDelegate(uint target, int level, int internalFormat, int width, int height, int depth, int border, uint format, uint type, float[] pixels);
         static readonly TexImage3DDelegate glTexImage3D;
 
-        internal static void TexImage3D(TextureTarget target, int level, int internalFormat, int width, int height, int depth, int border, uint format, uint type, float[] pixels)
+        internal static void TexImage3D(TextureType target, int level, int internalFormat, int width, int height, int depth, int border, uint format, uint type, float[] pixels)
         {
             glTexImage3D((uint)target, level, internalFormat, width, height, depth, border, format, type, pixels);
             CheckErrors();
@@ -556,7 +604,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         delegate void TexParameterfDelegate(uint target, uint pname, float param);
         static readonly TexParameterfDelegate glTexParameterf;
 
-        internal static void TexParameterf(TextureTarget target, TextureParameterName pname, float param)
+        internal static void TexParameter(TextureType target, TextureParameterName pname, float param)
         {
             glTexParameterf((uint)target, (uint)pname, param);
             CheckErrors();
@@ -569,7 +617,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         delegate void TexParameterfvDelegate(uint target, uint pname, float[] param);
         static readonly TexParameterfvDelegate glTexParameterfv;
 
-        internal static void TexParameterfv(TextureTarget target, TextureParameterName pname, float[] param)
+        internal static void TexParameter(TextureType target, TextureParameterName pname, float[] param)
         {
             glTexParameterfv((uint)target, (uint)pname, param);
             CheckErrors();
@@ -582,7 +630,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         delegate void TexParameteriDelegate(uint target, uint pname, int param);
         static readonly TexParameteriDelegate glTexParameteri;
 
-        internal static void TexParameteri(TextureTarget target, TextureParameterName pname, int param)
+        internal static void TexParameter(TextureType target, TextureParameterName pname, int param)
         {
             glTexParameteri((uint)target, (uint)pname, param);
             CheckErrors();
@@ -595,7 +643,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         delegate void TexSubImage2DDelegate(uint target, int level, int xoffset, int yoffset, int width, int height, uint format, uint type, float[] pixels);
         static readonly TexSubImage2DDelegate glTexSubImage2D;
 
-        internal static void TexSubImage2D(TextureTarget target, int level, int xoffset, int yoffset, int width, int height, uint format, uint type, float[] pixels)
+        internal static void TexSubImage2D(TextureType target, int level, int xoffset, int yoffset, int width, int height, uint format, uint type, float[] pixels)
         {
             glTexSubImage2D((uint)target, level, xoffset, yoffset, width, height, format, type, pixels);
             CheckErrors();

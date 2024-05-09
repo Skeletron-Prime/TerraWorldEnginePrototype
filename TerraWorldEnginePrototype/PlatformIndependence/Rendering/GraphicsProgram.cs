@@ -2,7 +2,7 @@
 {
     public abstract class GraphicsProgram : IDisposable
     {
-        protected abstract bool IsDisposed { get; }
+        public abstract bool IsDisposed { get; protected set; }
         public abstract void Dispose();
     }
 }

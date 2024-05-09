@@ -3,18 +3,24 @@ using TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager.Win
 
 namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 {
-    internal class GLGraphicsDevice : GraphicsDevice
+    internal class GLDevice : GraphicsDevice
     {
         private readonly WGL wgl;
 
-        internal GLGraphicsDevice(Window window)
+        public override bool IsDisposed { get; protected set; }
+
+        internal GLDevice(Window window)
         {
             wgl = new WGL(window);
         }
 
         public override void Dispose()
         {
-            wgl.Dispose();
+            if (!IsDisposed)
+            {
+                wgl.Dispose();
+                IsDisposed = true;
+            }
         }
     }
 }

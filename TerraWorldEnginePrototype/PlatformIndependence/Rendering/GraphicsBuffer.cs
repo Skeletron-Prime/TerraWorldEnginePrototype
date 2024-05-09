@@ -1,10 +1,8 @@
-﻿using TerraWorldEnginePrototype.PlatformIndependence.Rendering.Primitives;
-
-namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering
+﻿namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering
 {
     public abstract class GraphicsBuffer : IDisposable
     {
-        protected abstract bool IsDisposed { get; }
+        public abstract bool IsDisposed { get; protected set; }
         public abstract void Dispose();
     }
 }
