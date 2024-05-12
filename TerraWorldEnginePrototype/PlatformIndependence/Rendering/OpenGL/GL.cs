@@ -1,8 +1,6 @@
 ﻿using System.Diagnostics;
-using System.Drawing;
 using System.Runtime.InteropServices;
-using TerraWorldEnginePrototype.PlatformIndependence.Rendering.Primitives;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL.Primitives;
 
 namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 {
@@ -20,6 +18,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             LoadFunction(out glClear, nameof(glClear));
             LoadFunction(out glBindBuffer, nameof(glBindBuffer));
             LoadFunction(out glBindTexture, nameof(glBindTexture));
+            LoadFunction(out glBufferSubData, nameof(glBufferSubData));
             LoadFunction(out glActiveTexture, nameof(glActiveTexture));
             LoadFunction(out glAttachShader, nameof(glAttachShader));
             LoadFunction(out glBindVertexArray, nameof(glBindVertexArray));
@@ -29,8 +28,10 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             LoadFunction(out glCreateShader, nameof(glCreateShader));
             LoadFunction(out glCullFace, nameof(glCullFace));
             LoadFunction(out glDeleteBuffers, nameof(glDeleteBuffers));
+            LoadFunction(out glDeleteProgram, nameof(glDeleteProgram));
             LoadFunction(out glDeleteShader, nameof(glDeleteShader));
             LoadFunction(out glDeleteTextures, nameof(glDeleteTextures));
+            LoadFunction(out glDeleteVertexArrays, nameof(glDeleteVertexArrays));
             LoadFunction(out glDrawArrays, nameof(glDrawArrays));
             LoadFunction(out glDrawElements, nameof(glDrawElements));
             LoadFunction(out glEnableVertexAttribArray, nameof(glEnableVertexAttribArray));
@@ -134,7 +135,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         /// </summary>
         /// <param name="target">The target to which the buffer object is bound</param>
         /// <param name="buffer">The buffer object to bind</param>
-        internal static void BindBuffer(BufferTarget target, uint buffer)
+        internal static void BindBuffer(BufferType target, uint buffer)
         {
             glBindBuffer((uint)target, buffer);
             CheckErrors();
@@ -173,7 +174,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         unsafe delegate void BufferDataDelegate(uint target, int size, void* data, uint usage);
         static readonly BufferDataDelegate glBufferData;
 
-        public unsafe static void BufferData<T>(BufferTarget target, T[] data, BufferUsage usage) where T : unmanaged
+        public unsafe static void BufferData<T>(BufferType target, T[] data, BufferUsage usage) where T : unmanaged
         {
             var size = data.Length * sizeof(T);
 
@@ -191,7 +192,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         unsafe delegate void BufferSubDataDelegate(uint target, int offset, int size, void* data);
         static readonly BufferSubDataDelegate glBufferSubData;
 
-        public unsafe static void BufferSubData<T>(BufferTarget target, int offset, T[] data) where T : unmanaged
+        public unsafe static void BufferSubData<T>(BufferType target, int offset, T[] data) where T : unmanaged
         {
             var size = data.Length * sizeof(T);
 

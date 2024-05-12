@@ -1,34 +1,30 @@
-﻿using TerraWorldEnginePrototype.PlatformIndependence.Rendering.Primitives;
+﻿using TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL.Primitives;
 
 namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 {
-    internal class GLShader : GraphicsShader
+    public class GLShader : IGLObject, IDisposable
     {
-        internal uint ID { get; private set; }
-        public override bool IsDisposed { get; protected set; }
+        public uint Id { get; protected set; }
+        public IGLObjectType Type => IGLObjectType.Shader;
 
-        internal GLShader(ShaderType type, string source)
+        public GLShader(ShaderType type, string source)
         {
-            ID = GL.CreateShader(type);
-            GL.ShaderSource(ID, source);
-            GL.CompileShader(ID);
+            Id = GL.CreateShader(type);
+            GL.ShaderSource(Id, source);
+            GL.CompileShader(Id);
 
-            GL.GetShaderiv(ID, ShaderParameterName.CompileStatus, out bool success);
+            GL.GetShaderiv(Id, ShaderParameterName.CompileStatus, out bool success);
             if (!success)
             {
                 char[] infoLog = new char[512];
-                GL.GetShaderInfoLog(ID, 512, out _, infoLog);
+                GL.GetShaderInfoLog(Id, 512, out _, infoLog);
                 Console.WriteLine($"ERROR::SHADER::{type}::COMPILATION_FAILED\n{infoLog}");
             }
         }
 
-        public override void Dispose()
+        public void Dispose()
         {
-            if (!IsDisposed)
-            {
-                GL.DeleteShader(ID);
-                IsDisposed = true;
-            }
+            GL.DeleteShader(Id);
         }
     }
 }

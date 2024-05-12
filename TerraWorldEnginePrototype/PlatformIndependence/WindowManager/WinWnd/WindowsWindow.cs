@@ -1,6 +1,5 @@
 ﻿using System.Runtime.InteropServices;
 using TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL;
-using TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager;
 
 namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager.WinWnd
 {
@@ -29,6 +28,10 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
         GraphicsDevice graphicsDevice;
 
         private readonly WndProc windowProcDelegate;
+
+        static WindowsWindow()
+        {
+        }
 
         public WindowsWindow(WindowSettings windowSettings)
         {

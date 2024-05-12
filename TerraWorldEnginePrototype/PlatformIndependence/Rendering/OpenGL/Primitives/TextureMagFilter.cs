@@ -1,4 +1,4 @@
-﻿namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.Primitives
+﻿namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL.Primitives
 {
     public enum TextureMagFilter : uint
     {

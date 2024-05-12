@@ -1,42 +1,41 @@
-﻿using TerraWorldEnginePrototype.PlatformIndependence.Rendering.Primitives;
+﻿using TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL.Primitives;
 
 namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 {
-    public class GLBuffer<T> : GraphicsBuffer 
+    public class GLBuffer<T> : GLBuffer 
         where T : unmanaged
     {
-        private readonly BufferTarget target;
-
-        public uint ID { get; private set; }
-        public override bool IsDisposed { get; protected set; }
-
-        internal GLBuffer(BufferTarget target)
+        public GLBuffer()
         {
-            ID = GL.GenBuffer();
-            this.target = target;
-
-            Bind();
+            Id = GL.GenBuffer();
         }
 
-        internal void BufferData(T[] data, BufferUsage usage)
+        public void BufferData(T[] data, BufferUsage usage)
         {
-            Bind();
-
-            GL.BufferData(target, data, usage);
+            GL.BindBuffer(BufferType.ArrayBuffer, Id);
+            GL.BufferData(BufferType.ArrayBuffer, data, usage);
         }
 
-        public void Bind()
+        public void BufferSubData(int offset, T[] data)
         {
-            GL.BindBuffer(target, ID);
+            GL.BindBuffer(BufferType.ArrayBuffer, Id);
+            GL.BufferSubData(BufferType.ArrayBuffer, offset, data);
+        }
+    }
+
+    public class GLBuffer : IGLObject, IDisposable
+    {
+        public uint Id { get; protected init; }
+        public IGLObjectType Type => IGLObjectType.Buffer;
+
+        public void Bind(BufferType target)
+        {
+            GL.BindBuffer(target, Id);
         }
 
-        public override void Dispose()
+        public void Dispose()
         {
-            if (!IsDisposed)
-            {
-                GL.DeleteBuffer(ID);
-                IsDisposed = true;
-            }
+            GL.DeleteBuffer(Id);
         }
     }
 }

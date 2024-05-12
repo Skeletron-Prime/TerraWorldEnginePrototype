@@ -1,50 +1,49 @@
-﻿using TerraWorldEnginePrototype.PlatformIndependence.Rendering.Primitives;
+﻿using TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL.Primitives;
 
 namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 {
-    internal class GLProgram : GraphicsProgram
+    public class GLProgram : IGLObject, IDisposable
     {
-        internal uint ID { get; private set; }
-        public override bool IsDisposed { get; protected set; }
+        public uint Id { get; protected set; }
+        public IGLObjectType Type => IGLObjectType.Program;
 
-        internal GLProgram(Dictionary<ShaderType, string> shadersources)
+        public GLProgram(Dictionary<ShaderType, string> shaderSources)
         {
-            GLShader[] shaders = new GLShader[shadersources.Count];
+            Id = GL.CreateProgram();
 
-            ID = GL.CreateProgram();
+            GLShader[] shaders = new GLShader[shaderSources.Count];
 
-            for (int i = 0; i < shadersources.Count; i++)
+            for (int i = 0; i < shaderSources.Count; i++)
             {
-                shaders[i] = new GLShader(shadersources.ElementAt(i).Key, shadersources.ElementAt(i).Value);
-
-                GL.AttachShader(ID, shaders[i].ID);
+                shaders[i] = new GLShader(shaderSources.ElementAt(i).Key, shaderSources.ElementAt(i).Value);
+                GL.AttachShader(Id, shaders[i].Id);
             }
 
-            GL.LinkProgram(ID);
+            GL.LinkProgram(Id);
 
-            GL.GetProgramiv(ID, ShaderParameterName.LinkStatus, out bool success);
+            GL.GetProgramiv(Id, ShaderParameterName.LinkStatus, out bool success);
+
             if (!success)
             {
                 byte[] infoLog = new byte[512];
-                GL.GetProgramInfoLog(ID, 512, out _, infoLog);
+                GL.GetProgramInfoLog(Id, 512, out _, infoLog);
                 Console.WriteLine($"ERROR::SHADER::PROGRAM::LINKING_FAILED\n{infoLog}");
             }
 
-            foreach (GLShader shader in shaders)
+            foreach (var shader in shaders)
             {
                 shader.Dispose();
             }
-
-            GL.UseProgram(ID);
         }
 
-        public override void Dispose()
+        public void Use()
         {
-            if (!IsDisposed)
-            {
-                GL.DeleteProgram(ID);
-                IsDisposed = true;
-            }
+            GL.UseProgram(Id);
+        }
+
+        public void Dispose()
+        {
+            GL.DeleteProgram(Id);
         }
     }
 }
