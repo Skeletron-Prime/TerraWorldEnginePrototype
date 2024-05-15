@@ -5,19 +5,6 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
 {
     public class WindowsWindow : Window
     {
-        const uint CS_HREDRAW = 0x0002;
-        const uint CS_VREDRAW = 0x0001;
-        const uint WM_CLOSE = 0x0010;
-        const uint WM_PAINT = 0x000F;
-        const uint WS_OVERLAPPEDWINDOW = 0x00CF;
-        const uint WS_VISIBLE = 0x10000000;
-        const uint WS_SYSMENU = 0x00080000;
-        const uint WS_MINIMIZEBOX = 0x00020000;
-        const uint WS_MAXIMIZEBOX = 0x00010000;
-        const uint WS_CAPTION = 0x00C00000;
-        const uint WS_EX_APPWINDOW = 0x40000;
-        const int SW_SHOWNORMAL = 1;
-
         nint hwnd;
 
         public override bool IsVisible => isVisible;
@@ -25,7 +12,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
         internal nint hdc;
         bool isVisible = true;
 
-        GraphicsDevice graphicsDevice;
+        WGL wgl;
 
         private readonly WndProc windowProcDelegate;
 
@@ -39,18 +26,36 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
 
             WNDCLASS wc = new WNDCLASS
             {
-                style = CS_HREDRAW | CS_VREDRAW,
+                style = Win32.CS_HREDRAW | Win32.CS_VREDRAW,
                 lpfnWndProc = Marshal.GetFunctionPointerForDelegate(windowProcDelegate),
                 hInstance = Marshal.GetHINSTANCE(typeof(WindowsWindow).Module),
                 hbrBackground = nint.Zero,
                 lpszClassName = windowSettings.Title
             };
 
-            RegisterClass(ref wc);
+            Win32.RegisterClass(ref wc);
 
-            hwnd = CreateWindowEx(WS_EX_APPWINDOW, wc.lpszClassName, windowSettings.Title, WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX, windowSettings.XLocation, windowSettings.YLocation, windowSettings.Width, windowSettings.Height, nint.Zero, nint.Zero, wc.hInstance, nint.Zero);
+            hwnd = Win32.CreateWindowEx
+                (
+                Win32.WS_EX_APPWINDOW, 
+                wc.lpszClassName, 
+                windowSettings.Title, 
+                Win32.WS_OVERLAPPEDWINDOW | 
+                Win32.WS_VISIBLE | 
+                Win32.WS_SYSMENU | 
+                Win32.WS_MINIMIZEBOX | 
+                Win32.WS_MAXIMIZEBOX, 
+                (int)windowSettings.Location.X, 
+                (int)windowSettings.Location.Y, 
+                (int)windowSettings.Size.X, 
+                (int)windowSettings.Size.Y, 
+                nint.Zero, 
+                nint.Zero, 
+                wc.hInstance, 
+                nint.Zero
+                );
 
-            hdc = GetDC(hwnd);
+            hdc = Win32.GetDC(hwnd);
 
             PIXELFORMATDESCRIPTOR pfd = new PIXELFORMATDESCRIPTOR
             {
@@ -63,108 +68,58 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
                 cStencilBits = 8
             };
 
-            int iPixelFormat = ChoosePixelFormat(hdc, ref pfd);
-            SetPixelFormat(hdc, iPixelFormat, ref pfd);
+            int iPixelFormat = Win32.ChoosePixelFormat(hdc, ref pfd);
+            Win32.SetPixelFormat(hdc, iPixelFormat, ref pfd);
 
-            graphicsDevice = new GLDevice(this);
+            wgl = new WGL(this);
         }
 
         public override void Show()
         {
-            ShowWindow(hwnd, SW_SHOWNORMAL);
-            UpdateWindow(hwnd);
+            Win32.ShowWindow(hwnd, Win32.SW_SHOWNORMAL);
+            Win32.UpdateWindow(hwnd);
         }
 
         public override void PoolEvents()
         {
-            while (PeekMessage(out MSG msg, nint.Zero, 0, 0, 1))
+            while (Win32.PeekMessage(out MSG msg, nint.Zero, 0, 0, 1))
             {
-                TranslateMessage(ref msg);
-                DispatchMessage(ref msg);
+                Win32.TranslateMessage(ref msg);
+                Win32.DispatchMessage(ref msg);
             }
         }
 
         public override void SwapBuffers()
         {
-            _ = SwapBuffers(hdc);
+            _ = Win32.SwapBuffers(hdc);
         }
 
         public override void Dispose()
         {
-            graphicsDevice.Dispose();
-            DestroyWindow(hwnd);
+            wgl.Dispose();
+            Win32.DestroyWindow(hwnd);
         }
 
         nint WindowProc(nint hWnd, uint uMsg, nint wParam, nint lParam)
         {
             switch (uMsg)
             {
-                case WM_CLOSE:
+                case Win32.WM_CLOSE:
                     PostQuitMessage(0);
                     return nint.Zero;
                 //case WM_PAINT:
                 //TextOut(hdc, 0, 0, "Hello, Windows!", 14);
                 //return IntPtr.Zero;
                 default:
-                    return DefWindowProc(hWnd, uMsg, wParam, lParam);
+                    return Win32.DefWindowProc(hWnd, uMsg, wParam, lParam);
             }
         }
 
         void PostQuitMessage(int exitCode)
         {
-            DestroyWindow(hwnd);
+            Win32.DestroyWindow(hwnd);
             isVisible = false;
         }
-
-        [DllImport("user32.dll")]
-        static extern nint DefWindowProc(nint hWnd, uint uMsg, nint wParam, nint lParam);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        static extern ushort RegisterClass([In] ref WNDCLASS lpWndClass);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        static extern nint CreateWindowEx(uint dwExStyle, string lpClassName, string lpWindowName, uint dwStyle, int x, int y, int nWidth, int nHeight, nint hWndParent, nint hMenu, nint hInstance, nint lpParam);
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool ShowWindow(nint hWnd, int nCmdShow);
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool UpdateWindow(nint hWnd);
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool PeekMessage(out MSG lpMsg, nint hWnd, uint wMsgFilterMin, uint wMsgFilterMax, uint wRemoveMsg);
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool TranslateMessage([In] ref MSG lpMsg);
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool DispatchMessage([In] ref MSG lpmsg);
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool DestroyWindow(nint hWnd);
-
-        [DllImport("gdi32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool SetPixelFormat(nint hdc, int iPixelFormat, ref PIXELFORMATDESCRIPTOR ppfd);
-
-        [DllImport("gdi32.dll", SetLastError = true)]
-        static extern int ChoosePixelFormat(nint hdc, ref PIXELFORMATDESCRIPTOR ppfd);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        static extern nint GetDC(nint hWnd);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool ReleaseDC(nint hWnd, nint hdc);
-
-        [DllImport("gdi32.dll", SetLastError = true)]
-        static extern int SwapBuffers(nint hdc);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         delegate nint WndProc(nint hWnd, uint uMsg, nint wParam, nint lParam);

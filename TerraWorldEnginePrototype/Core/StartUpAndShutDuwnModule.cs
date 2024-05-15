@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using TerraWorldEnginePrototype.Core.Mathematics;
 using TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL;
 using TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager;
 
@@ -10,29 +9,24 @@ namespace TerraWorldEnginePrototype.Core
     /// </summary>
     public class StartUpAndShutDuwnModule : Object
     {
-        static Window? window;
-
         public static void StartUp()
         {
-            window = Window.Create(new WindowSettings());
+            WindowSettings windowSettings = new WindowSettings();
+            windowSettings.Size = new Vector2(1280, 720);
 
-            GL.Viewport(0, 0, 800, 600);
-
-            GL.ClearColor(0f, 0f, 0f, 1.0f);
-
-            window.Show();
-
-            while (window.IsVisible)
-            {
-                window.PoolEvents();
-
-                window.SwapBuffers();
-            }
+            EngineWindow engineWindow = new EngineWindow(windowSettings);
+            engineWindow.Run();
         }
 
         public static void ShutDown()
         {
-            window!.Dispose();
+        }
+    }
+
+    public class EngineWindow : NativeWindow
+    {
+        public EngineWindow(WindowSettings windowSettings) : base(windowSettings)
+        {
         }
     }
 }
