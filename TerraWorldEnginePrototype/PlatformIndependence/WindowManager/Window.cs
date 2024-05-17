@@ -1,18 +1,28 @@
-﻿using TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager.WinWnd;
+﻿using System.Runtime.InteropServices;
+using TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager.WinWnd;
 
 namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
 {
     public abstract class Window
     {
+        public WindowSettings Settings { get; set; }
+
+        public Action? OnPaint;
+
+        public Window(WindowSettings windowSettings)
+        {
+            Settings = windowSettings;
+        }
+
         public static Window Create(WindowSettings windowSettings)
         {
-            if (PlatformDetection.IsWindows)
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 return new WindowsWindow(windowSettings);
             }
             else
             {
-                throw new PlatformNotSupportedException();
+                throw new PlatformNotSupportedException("Windows only!");
             }
         }
 
@@ -26,7 +36,5 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
         public abstract void SwapBuffers();
 
         public abstract void Dispose();
-
-        public abstract bool IsVisible { get; }
     }
 }

@@ -4,10 +4,10 @@
     {
         private Window window;
 
-        public event Action Load;
-        public event Action Update;
-        public event Action Render;
-        public event Action Unload;
+        public event Action? Load;
+        public event Action? Update;
+        public event Action? Render;
+        public event Action? Unload;
 
         public NativeWindow(WindowSettings settings)
         {
@@ -18,7 +18,7 @@
         public void Run()
         {
             OnLoad();
-            while (window.IsVisible)
+            while (window.Settings.IsVisible)
             {
                 OnUpdate();
                 OnRender();

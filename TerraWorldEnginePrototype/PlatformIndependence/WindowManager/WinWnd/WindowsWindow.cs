@@ -1,26 +1,16 @@
 ﻿using System.Runtime.InteropServices;
-using TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL;
 
 namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager.WinWnd
 {
     public class WindowsWindow : Window
     {
-        nint hwnd;
-
-        public override bool IsVisible => isVisible;
-
-        internal nint hdc;
-        bool isVisible = true;
-
-        WGL wgl;
-
+        private nint hwnd;
+        private WGL wgl;
         private readonly WndProc windowProcDelegate;
 
-        static WindowsWindow()
-        {
-        }
+        public nint hdc;
 
-        public WindowsWindow(WindowSettings windowSettings)
+        public WindowsWindow(WindowSettings settings) : base(settings)
         {
             windowProcDelegate = WindowProc;
 
@@ -30,30 +20,12 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
                 lpfnWndProc = Marshal.GetFunctionPointerForDelegate(windowProcDelegate),
                 hInstance = Marshal.GetHINSTANCE(typeof(WindowsWindow).Module),
                 hbrBackground = nint.Zero,
-                lpszClassName = windowSettings.Title
+                lpszClassName = settings.Title
             };
 
             Win32.RegisterClass(ref wc);
 
-            hwnd = Win32.CreateWindowEx
-                (
-                Win32.WS_EX_APPWINDOW, 
-                wc.lpszClassName, 
-                windowSettings.Title, 
-                Win32.WS_OVERLAPPEDWINDOW | 
-                Win32.WS_VISIBLE | 
-                Win32.WS_SYSMENU | 
-                Win32.WS_MINIMIZEBOX | 
-                Win32.WS_MAXIMIZEBOX, 
-                (int)windowSettings.Location.X, 
-                (int)windowSettings.Location.Y, 
-                (int)windowSettings.Size.X, 
-                (int)windowSettings.Size.Y, 
-                nint.Zero, 
-                nint.Zero, 
-                wc.hInstance, 
-                nint.Zero
-                );
+            hwnd = Win32.CreateWindowEx(Win32.WS_EX_APPWINDOW, wc.lpszClassName, settings.Title, Win32.WS_OVERLAPPEDWINDOW | Win32.WS_VISIBLE | Win32.WS_SYSMENU | Win32.WS_MINIMIZEBOX | Win32.WS_MAXIMIZEBOX, (int)settings.Location.X, (int)settings.Location.Y, (int)settings.Size.X, (int)settings.Size.Y, nint.Zero, nint.Zero, wc.hInstance,nint.Zero);
 
             hdc = Win32.GetDC(hwnd);
 
@@ -118,7 +90,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
         void PostQuitMessage(int exitCode)
         {
             Win32.DestroyWindow(hwnd);
-            isVisible = false;
+            Settings.IsVisible = false;
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]

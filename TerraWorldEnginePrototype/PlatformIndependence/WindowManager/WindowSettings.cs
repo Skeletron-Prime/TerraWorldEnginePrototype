@@ -9,5 +9,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
         public Vector2 Size { get; set; } = new Vector2(800, 600);
 
         public Vector2 Location { get; set; } = new Vector2(1200, 400);
+
+        public bool IsVisible { get; set; } = true;
     }
 }
