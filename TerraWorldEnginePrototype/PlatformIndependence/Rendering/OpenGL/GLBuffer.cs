@@ -5,21 +5,28 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
     public class GLBuffer<T> : GLBuffer 
         where T : unmanaged
     {
+        private int size;
+
         public GLBuffer()
         {
             Id = GL.GenBuffer();
         }
 
-        public void BufferData(T[] data, BufferUsage usage)
+        public unsafe void BufferData(T[] data, BufferType type, BufferUsage usage)
         {
-            GL.BindBuffer(BufferType.ArrayBuffer, Id);
-            GL.BufferData(BufferType.ArrayBuffer, data, usage);
-        }
+            GL.BindBuffer(type, Id);
 
-        public void BufferSubData(int offset, T[] data)
-        {
-            GL.BindBuffer(BufferType.ArrayBuffer, Id);
-            GL.BufferSubData(BufferType.ArrayBuffer, offset, data);
+            if (size > data.Length * sizeof(T))
+            {
+                // buffer sub data to avoid reallocation
+                GL.BufferSubData(type, 0, data);
+            }
+            else
+            {
+                GL.BufferData(type, data, usage);
+            }
+
+            size = data.Length * sizeof(T);
         }
     }
 

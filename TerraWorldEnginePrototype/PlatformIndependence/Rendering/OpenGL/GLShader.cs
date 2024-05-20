@@ -10,7 +10,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         public GLShader(ShaderType type, string source)
         {
             Id = GL.CreateShader(type);
-            GL.ShaderSource(Id, source);
+            GL.ShaderSource(Id, File.ReadAllText(source));
             GL.CompileShader(Id);
 
             GL.GetShaderiv(Id, ShaderParameterName.CompileStatus, out bool success);

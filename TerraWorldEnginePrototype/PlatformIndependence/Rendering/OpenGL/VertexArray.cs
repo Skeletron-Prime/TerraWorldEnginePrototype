@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
 using TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL.Primitives;
 
 namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
@@ -8,7 +9,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         public uint Id { get; protected init; }
         public IGLObjectType Type => IGLObjectType.VertexArray;
 
-        private readonly List<VertexAttribute> Attributes = new();
+        private readonly List<VertexAttribute> Attributes = [];
         private bool IsBuilt = false;
 
         public VertexArray()
@@ -16,29 +17,92 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             Id = GL.GenVertexArray();
         }
 
-        public void AddAttribute(GLBuffer buffer, uint index, int size, DataType type, bool normalized, int stride, int offset)
+        public void AddAttribute3f()
         {
             Attributes.Add(new VertexAttribute
             {
-                Buffer = buffer,
-                Index = index,
-                Size = size,
-                Type = type,
-                Normalized = normalized,
-                Stride = stride,
-                Offset = offset
+                Index = (uint)Attributes.Count,
+                Size = 3,
+                Type = DataType.Float,
+                Normalized = false,
             });
         }
 
-        public void Build()
+        public void AddAttribute4f()
+        {
+            Attributes.Add(new VertexAttribute
+            {
+                Index = (uint)Attributes.Count,
+                Size = 4,
+                Type = DataType.Float,
+                Normalized = false,
+            });
+        }
+
+        public unsafe void Build(GLBuffer buffer) 
         {
             GL.BindVertexArray(Id);
 
-            foreach (var (buffer, index, size, type, normalized, stride, offset) in Attributes)
+            buffer.Bind(BufferType.ArrayBuffer);
+
+            int stride = 0;
+            int offset = 0;
+
+            foreach (var attribute in Attributes)
             {
-                buffer.Bind(BufferType.ArrayBuffer);
+                switch (attribute.Type)
+                {
+                    case DataType.Byte:
+                    case DataType.UnsignedByte:
+                        stride += sizeof(byte) * attribute.Size;
+                        break;
+                    case DataType.Short:
+                    case DataType.UnsignedShort:
+                        stride += sizeof(ushort) * attribute.Size;
+                        break;
+                    case DataType.Int:
+                    case DataType.UnsignedInt:
+                        stride += sizeof(int) * attribute.Size;
+                        break;
+                    case DataType.Float:
+                        stride += sizeof(float) * attribute.Size;
+                        break;
+                    case DataType.Double:
+                        stride += sizeof(double) * attribute.Size;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+            foreach (var (index, size, type, normalized) in Attributes)
+            {
                 GL.VertexAttribPointer(index, size, type, normalized, stride, offset);
                 GL.EnableVertexAttribArray(index);
+
+                switch (type)
+                {
+                    case DataType.Byte:
+                    case DataType.UnsignedByte:
+                        offset += sizeof(byte) * size;
+                        break;
+                    case DataType.Short:
+                    case DataType.UnsignedShort:
+                        offset += sizeof(ushort) * size;
+                        break;
+                    case DataType.Int:
+                    case DataType.UnsignedInt:
+                        offset += sizeof(int) * size;
+                        break;
+                    case DataType.Float:
+                        offset += sizeof(float) * size;
+                        break;
+                    case DataType.Double:
+                        offset += sizeof(double) * size;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
 
             GL.BindVertexArray(0);
@@ -64,25 +128,19 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 
         private struct VertexAttribute
         {
-            public GLBuffer Buffer { get; set; }
             public uint Index { get; set; }
             public int Size { get; set; }
             public DataType Type { get; set; }
             public bool Normalized { get; set; }
-            public int Stride { get; set; }
-            public int Offset { get; set; }
 
             //deconstructor
 
-            public void Deconstruct(out GLBuffer buffer, out uint index, out int size, out DataType type, out bool normalized, out int stride, out int offset)
+            public void Deconstruct(out uint index, out int size, out DataType type, out bool normalized)
             {
-                buffer = Buffer;
                 index = Index;
                 size = Size;
                 type = Type;
                 normalized = Normalized;
-                stride = Stride;
-                offset = Offset;
             }
         }
     }

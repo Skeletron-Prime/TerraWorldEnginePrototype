@@ -7,16 +7,24 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         public uint Id { get; protected set; }
         public IGLObjectType Type => IGLObjectType.Program;
 
-        public GLProgram(Dictionary<ShaderType, string> shaderSources)
+        private List<GLShader> Shaders = new();
+
+        public GLProgram()
         {
             Id = GL.CreateProgram();
+        }
 
-            GLShader[] shaders = new GLShader[shaderSources.Count];
+        public void AddShader(ShaderType type, string source)
+        {
+            GLShader shader = new GLShader(type, source);
+            Shaders.Add(shader);
+        }
 
-            for (int i = 0; i < shaderSources.Count; i++)
+        public void Build()
+        {
+            foreach (var shader in Shaders)
             {
-                shaders[i] = new GLShader(shaderSources.ElementAt(i).Key, shaderSources.ElementAt(i).Value);
-                GL.AttachShader(Id, shaders[i].Id);
+                GL.AttachShader(Id, shader.Id);
             }
 
             GL.LinkProgram(Id);
@@ -30,10 +38,12 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
                 Console.WriteLine($"ERROR::SHADER::PROGRAM::LINKING_FAILED\n{infoLog}");
             }
 
-            foreach (var shader in shaders)
+            foreach (var shader in Shaders)
             {
                 shader.Dispose();
             }
+
+            Shaders.Clear();
         }
 
         public void Use()
