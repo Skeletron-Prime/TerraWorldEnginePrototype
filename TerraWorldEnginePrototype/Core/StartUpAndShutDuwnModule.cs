@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics;
+using System.Numerics;
 using TerraWorldEnginePrototype.Core.Mathematics;
 using TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL;
 using TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL.Primitives;
@@ -28,40 +29,30 @@ namespace TerraWorldEnginePrototype.Core
     public class EngineWindow : NativeWindow
     {
         Mesh mesh;
+        GLRenderer renderer;
 
         public EngineWindow(WindowSettings windowSettings) : base(windowSettings)
         {
-            GLProgram program = new GLProgram();
-            program.AddShader(ShaderType.VertexShader, "E:\\Coding\\GameEngine\\Prototype\\TerraWorldEnginePrototype\\PlatformIndependence\\Rendering\\OpenGL\\Shaders\\shader.vert");
-            program.AddShader(ShaderType.FragmentShader, "E:\\Coding\\GameEngine\\Prototype\\TerraWorldEnginePrototype\\PlatformIndependence\\Rendering\\OpenGL\\Shaders\\shader.frag");
+            renderer = new GLRenderer();
 
-            program.Build();
-
-            // make me please a mesh for rectangle
+            // create a triangle
             mesh = new Mesh(
             [
-                new Vector3(-0.5f, -0.5f, 0.0f),
-                new Vector3(0.5f, -0.5f, 0.0f),
-                new Vector3(0.5f, 0.5f, 0.0f),
-                new Vector3(0.5f, 0.5f, 0.0f),
-                new Vector3(-0.5f, 0.5f, 0.0f),
-                new Vector3(-0.5f, -0.5f, 0.0f)
+                new Vector3(-0.5f, -0.5f, 0.0f),  // bottom left
+                new Vector3(0.5f, -0.5f, 0.0f),   // bottom right
+                new Vector3(0.0f, 0.5f, 0.0f)     // top
             ]);
+
+            mesh.Colors =
+            [
+                Color.Red,
+                Color.Green,
+                Color.Blue
+            ];
         }
 
         public override void OnLoad()
         {
-            VertexArray vertexArray = new VertexArray();
-
-            GLBuffer<Vector3> vertexBuffer = new GLBuffer<Vector3>();
-            vertexBuffer.Bind(BufferType.ArrayBuffer);
-            vertexBuffer.BufferData(mesh.Vertices, BufferType.ArrayBuffer, BufferUsage.StaticDraw);
-
-            vertexArray.AddAttribute3f();
-            vertexArray.Build(vertexBuffer);
-
-            vertexArray.Bind();
-
             base.OnLoad();
         }
 
@@ -69,9 +60,21 @@ namespace TerraWorldEnginePrototype.Core
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            GL.DrawArrays(DrawMode.Triangles, 0, mesh.Vertices.Length);
+            renderer.Draw(mesh);
 
             base.OnRender();
+        }
+    }
+
+    public struct Vertex
+    {
+        public Vector3 Position;
+        public Color Color;
+
+        public Vertex(Vector3 position, Color color)
+        {
+            Position = position;
+            Color = color;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL.Primitives;
 
@@ -55,9 +56,10 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             LoadFunction(out glTexParameteri, nameof(glTexParameteri));
             LoadFunction(out glTexSubImage2D, nameof(glTexSubImage2D));
             LoadFunction(out glUseProgram, nameof(glUseProgram));
+            LoadFunction(out glUniform4f, nameof(glUniform4f));
+            LoadFunction(out glUniformMatrix4fv, nameof(glUniformMatrix4fv));
             LoadFunction(out glVertexAttribPointer, nameof(glVertexAttribPointer));
             LoadFunction(out glViewport, nameof(glViewport));
-            LoadFunction(out glUniform4f, nameof(glUniform4f));
 
             LoadFunction(out glGetError, nameof(glGetError));
         }
@@ -665,6 +667,56 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 
         #endregion
 
+        #region Uniform 4 Float
+
+        delegate void Uniform4fDelegate(int location, float v0, float v1, float v2, float v3);
+        static readonly Uniform4fDelegate glUniform4f;
+
+        internal static void Uniform4f(int location, float v0, float v1, float v2, float v3)
+        {
+            glUniform4f(location, v0, v1, v2, v3);
+            CheckErrors();
+        }
+
+        #endregion
+
+        #region Uniform Matrix 4 Float
+
+        delegate void UniformMatrix4fvDelegate(int location, int count, bool transpose, float[] value);
+        static readonly UniformMatrix4fvDelegate glUniformMatrix4fv;
+
+        internal static void UniformMatrix4(int location, bool transpose, ref Matrix4x4 value)
+        {
+            float[] matrix =
+            [
+                value.M11,
+                value.M12,
+                value.M13,
+                value.M14,
+                value.M21,
+                value.M22,
+                value.M23,
+                value.M24,
+                value.M31,
+                value.M32,
+                value.M33,
+                value.M34,
+                value.M41,
+                value.M42,
+                value.M43,
+                value.M44,
+            ];
+            glUniformMatrix4fv(location, 1, transpose, matrix);
+        }
+
+        internal static void UniformMatrix4fv(int location, int count, bool transpose, float[] value)
+        {
+            glUniformMatrix4fv(location, count, transpose, value);
+            CheckErrors();
+        }
+
+        #endregion
+
         #region Vertex Attribute Pointer
 
         delegate void VertexAttribPointerDelegate(uint index, int size, uint type, bool normalized, int stride, int offset);
@@ -686,19 +738,6 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         internal static void Viewport(int x, int y, int width, int height)
         {
             glViewport(x, y, width, height);
-            CheckErrors();
-        }
-
-        #endregion
-
-        #region Uniform 4 Float
-
-        delegate void Uniform4fDelegate(int location, float v0, float v1, float v2, float v3);
-        static readonly Uniform4fDelegate glUniform4f;
-
-        internal static void Uniform4f(int location, float v0, float v1, float v2, float v3)
-        {
-            glUniform4f(location, v0, v1, v2, v3);
             CheckErrors();
         }
 

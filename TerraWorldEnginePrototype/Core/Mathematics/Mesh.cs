@@ -3,11 +3,74 @@ namespace TerraWorldEnginePrototype.Core.Mathematics
 {
     public class Mesh
     {
-        public Vector3[] Vertices;
+        private bool isChanged = true;
+
+        public readonly bool IsWriteable = true;
+        public readonly bool IsReadable = true;
+
+        private Vector3[]? vertices;
+        private Color[]? colors;
+
+        public Vector3[] Vertices
+        {
+            get => vertices ?? [];
+            set
+            {
+                if (!IsWriteable)
+                    return;
+
+                var needChange = vertices == null || vertices.Length != value.Length;
+                vertices = value;
+                isChanged = true;
+
+                if (needChange)
+                {
+                    colors = null;
+                }
+            }
+        }
+
+        public Color[] Colors
+        {
+            get => ReadVertexData(colors ?? []);
+            set => WriteVertexData(ref colors, value, value.Length);
+        }
+
+        public bool IsChanged
+        {
+            get => isChanged;
+            set => isChanged = value;
+        }
 
         public Mesh(Vector3[] vertices)
         {
             Vertices = vertices;
+        }
+
+        private T ReadVertexData<T>(T value)
+        {
+            if (!IsReadable)
+            {
+                throw new Exception("Mesh is not readable");
+            }
+
+            return value;
+        }
+
+        private void WriteVertexData<T>(ref T target, T value, int length)
+        {
+            if (!IsWriteable)
+            {
+                throw new System.Exception("Mesh is not writeable");
+            }
+
+            if (value == null || length <= 0 || length != (vertices?.Length ?? 0))
+            {
+                throw new Exception("Array length should match vertices length");
+            }
+
+            isChanged = true;
+            target = value;
         }
     }
 }

@@ -25,6 +25,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
                 Size = 3,
                 Type = DataType.Float,
                 Normalized = false,
+                Stride = 3
             });
         }
 
@@ -36,6 +37,19 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
                 Size = 4,
                 Type = DataType.Float,
                 Normalized = false,
+                Stride = 4
+            });
+        }
+
+        public void AddAttribute16f()
+        {
+            Attributes.Add(new VertexAttribute
+            {
+                Index = (uint)Attributes.Count,
+                Size = 4,
+                Type = DataType.Float,
+                Normalized = false,
+                Stride = 16
             });
         }
 
@@ -54,21 +68,21 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
                 {
                     case DataType.Byte:
                     case DataType.UnsignedByte:
-                        stride += sizeof(byte) * attribute.Size;
+                        stride += sizeof(byte) * attribute.Stride;
                         break;
                     case DataType.Short:
                     case DataType.UnsignedShort:
-                        stride += sizeof(ushort) * attribute.Size;
+                        stride += sizeof(ushort) * attribute.Stride;
                         break;
                     case DataType.Int:
                     case DataType.UnsignedInt:
-                        stride += sizeof(int) * attribute.Size;
+                        stride += sizeof(int) * attribute.Stride;
                         break;
                     case DataType.Float:
-                        stride += sizeof(float) * attribute.Size;
+                        stride += sizeof(float) * attribute.Stride;
                         break;
                     case DataType.Double:
-                        stride += sizeof(double) * attribute.Size;
+                        stride += sizeof(double) * attribute.Stride;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -107,6 +121,8 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 
             GL.BindVertexArray(0);
             IsBuilt = true;
+
+            Attributes.Clear();
         }
 
         public void Bind()
@@ -132,6 +148,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             public int Size { get; set; }
             public DataType Type { get; set; }
             public bool Normalized { get; set; }
+            public int Stride { get; set; }
 
             //deconstructor
 
