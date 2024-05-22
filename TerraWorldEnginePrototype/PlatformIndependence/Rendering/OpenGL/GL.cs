@@ -35,6 +35,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             LoadFunction(out glDeleteVertexArrays, nameof(glDeleteVertexArrays));
             LoadFunction(out glDrawArrays, nameof(glDrawArrays));
             LoadFunction(out glDrawElements, nameof(glDrawElements));
+            LoadFunction(out glEnable, nameof(glEnable));
             LoadFunction(out glEnableVertexAttribArray, nameof(glEnableVertexAttribArray));
             LoadFunction(out glFlush, nameof(glFlush));
             LoadFunction(out glGenBuffers, nameof(glGenBuffers));
@@ -373,6 +374,19 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         public static void DrawElements(DrawMode mode, int count, DataType type, int indices)
         {
             glDrawElements((uint)mode, count, (uint)type, indices);
+            CheckErrors();
+        }
+
+        #endregion
+
+        #region Enable
+
+        delegate void EnableDelegate(uint cap);
+        static readonly EnableDelegate glEnable;
+
+        internal static void Enable(EnableCap cap)
+        {
+            glEnable((uint)cap);
             CheckErrors();
         }
 
