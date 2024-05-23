@@ -1,6 +1,6 @@
 ﻿namespace TerraWorldEnginePrototype.Core.Mathematics
 {
-    public struct MathF
+    public struct MathHelper
     {
         public static float DegreesToRadians(float degrees)
         {

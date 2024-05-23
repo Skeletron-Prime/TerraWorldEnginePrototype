@@ -20,8 +20,8 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             vertexArray = new VertexArray();
             vertexBuffer = new GLBuffer<Vertex>();
 
-            program.AddShader(ShaderType.VertexShader, "E:\\Coding\\GameEngine\\Prototype\\TerraWorldEnginePrototype\\PlatformIndependence\\Rendering\\OpenGL\\Shaders\\VertexShader3D.glsl");
-            program.AddShader(ShaderType.FragmentShader, "E:\\Coding\\GameEngine\\Prototype\\TerraWorldEnginePrototype\\PlatformIndependence\\Rendering\\OpenGL\\Shaders\\FragmentShader3D.glsl");
+            program.AddShader(ShaderType.VertexShader, "PlatformIndependence\\Rendering\\OpenGL\\Shaders\\VertexShader3D.glsl");
+            program.AddShader(ShaderType.FragmentShader, "PlatformIndependence\\Rendering\\OpenGL\\Shaders\\FragmentShader3D.glsl");
 
             program.Build();
 

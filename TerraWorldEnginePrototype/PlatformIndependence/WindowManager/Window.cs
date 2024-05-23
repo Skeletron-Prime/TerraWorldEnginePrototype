@@ -9,6 +9,10 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
 
         public Action? OnPaint;
 
+        public WindowSizeCallback? OnSizeCallback;
+
+        public delegate void WindowSizeCallback(int width, int height);
+
         public Window(WindowSettings windowSettings)
         {
             Settings = windowSettings;
@@ -36,5 +40,10 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
         public abstract void SwapBuffers();
 
         public abstract void Dispose();
+
+        public void SetWindowSizeCallback(WindowSizeCallback callback)
+        {
+            OnSizeCallback = callback;
+        }
     }
 }

@@ -18,6 +18,11 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
         internal const uint WS_CAPTION = 0x00C00000;
         internal const uint WS_EX_APPWINDOW = 0x40000;
         internal const int SW_SHOWNORMAL = 1;
+        internal const int SW_SHOWMINIMIZED = 2;
+        internal const int SW_SHOWMAXIMIZED = 3;
+        internal const int SW_SHOW = 5;
+        internal const uint WS_THICKFRAME = 0x00040000;
+        internal const uint WM_SIZE = 0x0005;
 
         #endregion
 

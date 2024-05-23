@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager.WinWnd
 {
@@ -25,7 +26,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
 
             Win32.RegisterClass(ref wc);
 
-            hwnd = Win32.CreateWindowEx(Win32.WS_EX_APPWINDOW, wc.lpszClassName, settings.Title, Win32.WS_OVERLAPPEDWINDOW | Win32.WS_VISIBLE | Win32.WS_SYSMENU | Win32.WS_MINIMIZEBOX | Win32.WS_MAXIMIZEBOX, (int)settings.Location.X, (int)settings.Location.Y, (int)settings.Size.X, (int)settings.Size.Y, nint.Zero, nint.Zero, wc.hInstance,nint.Zero);
+            hwnd = Win32.CreateWindowEx(Win32.WS_EX_APPWINDOW, wc.lpszClassName, settings.Title, Win32.WS_OVERLAPPEDWINDOW | Win32.WS_VISIBLE | Win32.WS_SYSMENU | Win32.WS_MINIMIZEBOX | Win32.WS_MAXIMIZEBOX | Win32.WS_THICKFRAME, (int)settings.Location.X, (int)settings.Location.Y, (int)settings.Size.X, (int)settings.Size.Y, nint.Zero, nint.Zero, wc.hInstance,nint.Zero);
 
             hdc = Win32.GetDC(hwnd);
 
@@ -82,6 +83,12 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
                 //case WM_PAINT:
                 //TextOut(hdc, 0, 0, "Hello, Windows!", 14);
                 //return IntPtr.Zero;
+                case Win32.WM_SIZE:
+                    int width = (int)(lParam & 0xFFFF);
+                    int height = (int)((lParam >> 16) & 0xFFFF);
+                    OnResize(width, height);
+                    return nint.Zero;
+
                 default:
                     return Win32.DefWindowProc(hWnd, uMsg, wParam, lParam);
             }
@@ -91,6 +98,12 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
         {
             Win32.DestroyWindow(hwnd);
             Settings.IsVisible = false;
+        }
+
+        private void OnResize(int width, int height)
+        {
+            Settings.Size = new Vector2(width, height);
+            OnSizeCallback?.Invoke(width, height);
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
