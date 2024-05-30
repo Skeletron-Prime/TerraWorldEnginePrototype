@@ -42,10 +42,11 @@ namespace TerraWorldEnginePrototype.Core.Mathematics
             set => isChanged = value;
         }
 
-        public Mesh(Vector3[] vertices)
-        {
-            Vertices = vertices;
-        }
+        public int VertexCount => vertices?.Length ?? 0;
+
+        public bool HasColors => (colors?.Length ?? 0) > 0;
+
+        public Mesh() { }
 
         private T ReadVertexData<T>(T value)
         {

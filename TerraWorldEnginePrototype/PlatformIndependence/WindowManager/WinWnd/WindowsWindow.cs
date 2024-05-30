@@ -1,24 +1,40 @@
-﻿using System.Numerics;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
+using TerraWorldEnginePrototype.Core;
+using TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL;
 
 namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager.WinWnd
 {
-    public class WindowsWindow : Window
+    internal class WindowsWindow : Window
     {
-        private nint hwnd;
-        private WGL wgl;
-        private readonly WndProc windowProcDelegate;
+        internal nint hdc;
 
-        public nint hdc;
+        private readonly nint hwnd;
+        private readonly WndProc wndProc;
+        private GraphicsDevice graphicsDevice;
 
-        public WindowsWindow(WindowSettings settings) : base(settings)
+        internal override GraphicsDevice GraphicsDevice
         {
-            windowProcDelegate = WindowProc;
+            get => graphicsDevice; 
+            set
+            {
+                graphicsDevice = value;
+                graphicsDevice.SetViewport((int)Settings.Size.X, (int)Settings.Size.Y);
+            }
+        }
+
+        static WindowsWindow()
+        {
+            Win32.SetProcessDpiAwareness(PROCESS_DPI_AWARENESS.PROCESS_PER_MONITOR_DPI_AWARE);
+        }
+
+        internal WindowsWindow(WindowSettings settings, Input input) : base(settings, input)
+        {
+            wndProc = WindowProc;
 
             WNDCLASS wc = new WNDCLASS
             {
                 style = Win32.CS_HREDRAW | Win32.CS_VREDRAW,
-                lpfnWndProc = Marshal.GetFunctionPointerForDelegate(windowProcDelegate),
+                lpfnWndProc = Marshal.GetFunctionPointerForDelegate(wndProc),
                 hInstance = Marshal.GetHINSTANCE(typeof(WindowsWindow).Module),
                 hbrBackground = nint.Zero,
                 lpszClassName = settings.Title
@@ -44,16 +60,16 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
             int iPixelFormat = Win32.ChoosePixelFormat(hdc, ref pfd);
             Win32.SetPixelFormat(hdc, iPixelFormat, ref pfd);
 
-            wgl = new WGL(this);
+            graphicsDevice = new GLDevice(this);
         }
 
-        public override void Show()
+        internal override void Show()
         {
             Win32.ShowWindow(hwnd, Win32.SW_SHOWNORMAL);
             Win32.UpdateWindow(hwnd);
         }
 
-        public override void PoolEvents()
+        internal override void PoolEvents()
         {
             while (Win32.PeekMessage(out MSG msg, nint.Zero, 0, 0, 1))
             {
@@ -62,15 +78,20 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
             }
         }
 
-        public override void SwapBuffers()
+        internal override void SwapBuffers()
         {
             _ = Win32.SwapBuffers(hdc);
         }
 
-        public override void Dispose()
+        internal override void Dispose()
         {
-            wgl.Dispose();
+            graphicsDevice.Dispose();
             Win32.DestroyWindow(hwnd);
+        }
+
+        internal override void Invalidate()
+        {
+            Win32.InvalidateRect(hwnd, IntPtr.Zero, true);
         }
 
         nint WindowProc(nint hWnd, uint uMsg, nint wParam, nint lParam)
@@ -80,13 +101,24 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
                 case Win32.WM_CLOSE:
                     PostQuitMessage(0);
                     return nint.Zero;
-                //case WM_PAINT:
-                //TextOut(hdc, 0, 0, "Hello, Windows!", 14);
-                //return IntPtr.Zero;
+
+                case Win32.WM_PAINT:
+                    Win32.BeginPaint(hWnd, out PAINTSTRUCT ps);
+                    OnPaint?.Invoke();
+                    Win32.EndPaint(hWnd, ref ps);
+                    return IntPtr.Zero;
+
+                // TODO: Implement the rest of the cases
                 case Win32.WM_SIZE:
-                    int width = (int)(lParam & 0xFFFF);
-                    int height = (int)((lParam >> 16) & 0xFFFF);
-                    OnResize(width, height);
+                    return nint.Zero;
+
+                case Win32.WM_KEYDOWN:
+                    return nint.Zero;
+
+                case Win32.WM_KEYUP:
+                    return nint.Zero;
+
+                case Win32.WM_MOUSEMOVE:
                     return nint.Zero;
 
                 default:
@@ -98,12 +130,6 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
         {
             Win32.DestroyWindow(hwnd);
             Settings.IsVisible = false;
-        }
-
-        private void OnResize(int width, int height)
-        {
-            Settings.Size = new Vector2(width, height);
-            OnSizeCallback?.Invoke(width, height);
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]

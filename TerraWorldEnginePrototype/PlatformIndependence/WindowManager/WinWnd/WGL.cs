@@ -1,9 +1,17 @@
 ﻿using System.Runtime.InteropServices;
+using TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL;
 
 namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager.WinWnd
 {
-    internal class WGL
+    internal class WGL : GLExtension
     {
+        /// <summary>
+        /// The handle to the OpenGL rendering context.
+        /// </summary>
+        private nint hglrc;
+
+        private readonly WindowsWindow? window;
+
         internal WGL(Window window)
         {
             this.window = window as WindowsWindow;
@@ -21,16 +29,9 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
             wglSwapIntervalEXT(1);
         }
 
-        private WindowsWindow window;
-
-        /// <summary>
-        /// The handle to the OpenGL rendering context.
-        /// </summary>
-        private nint hglrc;
-
-        internal void Dispose()
+        public override void Dispose()
         {
-            wglMakeCurrent(window.hdc, nint.Zero);
+            wglMakeCurrent(window!.hdc, nint.Zero);
             wglDeleteContext(hglrc);
         }
 

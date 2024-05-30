@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
 using TerraWorldEnginePrototype.Core.Mathematics;
+using TerraWorldEnginePrototype.Graphics;
 using TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL;
 using TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL.Primitives;
 using TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager;
@@ -9,129 +10,23 @@ namespace TerraWorldEnginePrototype.Core
 {
     public class EngineWindow : NativeWindow
     {
-        Mesh mesh;
-        GLRenderer renderer;
+        EngineObject obj = new CubeObject(new Transform { Position = Vector3.Zero, Rotation = new Quaternion(0, 0, 0, 1), Scale = Vector3.One });
 
-        Stopwatch stopwatch = new Stopwatch();
+        EngineObject obj2 = new CubeObject(new Transform { Position = new Vector3(2, 0, 0), Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathHelper.DegreesToRadians(90f)), Scale = Vector3.One });
 
-        int Width;
-        int Height;
+        EngineObject obj3 = new CubeObject(new Transform { Position = new Vector3(0, 2, 0), Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathHelper.DegreesToRadians(180f)), Scale = Vector3.One });
 
-        public EngineWindow(WindowSettings windowSettings) : base(windowSettings)
+        EngineObject obj4 = new CubeObject(new Transform { Position = new Vector3(0, 0, 2), Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitX, MathHelper.DegreesToRadians(270f)), Scale = Vector3.One });
+
+        public EngineWindow(WindowSettings windowSettings, Input input) : base(windowSettings, input)
         {
-            renderer = new GLRenderer();
+            Matrix4x4 projection = Matrix4x4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45), windowSettings.Size.X / windowSettings.Size.Y, 0.1f, 100.0f);
 
-            Width = (int)windowSettings.Size.X;
-            Height = (int)windowSettings.Size.Y;
-
-            // create a cube 
-            mesh = new Mesh(
-            [
-                // Front face
-                new Vector3(-1.0f, -1.0f,  1.0f),
-                new Vector3( 1.0f, -1.0f,  1.0f),
-                new Vector3( 1.0f,  1.0f,  1.0f),
-                new Vector3( 1.0f,  1.0f,  1.0f),
-                new Vector3(-1.0f,  1.0f,  1.0f),
-                new Vector3(-1.0f, -1.0f,  1.0f),
-
-                // Back face
-                new Vector3(-1.0f, -1.0f, -1.0f),
-                new Vector3(-1.0f,  1.0f, -1.0f),
-                new Vector3( 1.0f,  1.0f, -1.0f),
-                new Vector3( 1.0f,  1.0f, -1.0f),
-                new Vector3( 1.0f, -1.0f, -1.0f),
-                new Vector3(-1.0f, -1.0f, -1.0f),
-
-                // Left face
-                new Vector3(-1.0f,  1.0f,  1.0f),
-                new Vector3(-1.0f,  1.0f, -1.0f),
-                new Vector3(-1.0f, -1.0f, -1.0f),
-                new Vector3(-1.0f, -1.0f, -1.0f),
-                new Vector3(-1.0f, -1.0f,  1.0f),
-                new Vector3(-1.0f,  1.0f,  1.0f),
-
-                // Right face
-                new Vector3( 1.0f,  1.0f,  1.0f),
-                new Vector3( 1.0f, -1.0f, -1.0f),
-                new Vector3( 1.0f,  1.0f, -1.0f),
-                new Vector3( 1.0f, -1.0f, -1.0f),
-                new Vector3( 1.0f,  1.0f,  1.0f),
-                new Vector3( 1.0f, -1.0f,  1.0f),
-
-                // Top face
-                new Vector3(-1.0f,  1.0f,  1.0f),
-                new Vector3( 1.0f,  1.0f,  1.0f),
-                new Vector3( 1.0f,  1.0f, -1.0f),
-                new Vector3( 1.0f,  1.0f, -1.0f),
-                new Vector3(-1.0f,  1.0f, -1.0f),
-                new Vector3(-1.0f,  1.0f,  1.0f),
-
-                // Bottom face
-                new Vector3(-1.0f, -1.0f,  1.0f),
-                new Vector3(-1.0f, -1.0f, -1.0f),
-                new Vector3( 1.0f, -1.0f, -1.0f),
-                new Vector3( 1.0f, -1.0f, -1.0f),
-                new Vector3( 1.0f, -1.0f,  1.0f),
-                new Vector3(-1.0f, -1.0f,  1.0f)
-            ]);
-
-            mesh.Colors =
-            [
-                // Front face
-                Color.Red,
-                Color.Red,
-                Color.Red,
-                Color.Red,
-                Color.Red,
-                Color.Red,
-
-                // Back face
-                Color.Green,
-                Color.Green,
-                Color.Green,
-                Color.Green,
-                Color.Green,
-                Color.Green,
-
-                // Left face
-                Color.Blue,
-                Color.Blue,
-                Color.Blue,
-                Color.Blue,
-                Color.Blue,
-                Color.Blue,
-
-                // Right face
-                Color.Yellow,
-                Color.Yellow,
-                Color.Yellow,
-                Color.Yellow,
-                Color.Yellow,
-                Color.Yellow,
-
-                // Top face
-                Color.Purple,
-                Color.Purple,
-                Color.Purple,
-                Color.Purple,
-                Color.Purple,
-                Color.Purple,
-
-                // Bottom face
-                Color.Cyan,
-                Color.Cyan,
-                Color.Cyan,
-                Color.Cyan,
-                Color.Cyan,
-                Color.Cyan
-            ];
+            Graphics.Graphics.Renderer.Projection(projection);
         }
 
         protected override void OnLoad()
         {
-            stopwatch.Start();
-
             GL.Enable(EnableCap.DepthTest);
 
             base.OnLoad();
@@ -141,31 +36,34 @@ namespace TerraWorldEnginePrototype.Core
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            renderer.Draw(mesh);
+            Matrix4x4 view = Matrix4x4.CreateLookAt(new Vector3(10, 10, 10), new Vector3(0, 0, 0), Vector3.UnitY);
 
-            Matrix4x4 model = Matrix4x4.CreateRotationZ(-(float)stopwatch.Elapsed.TotalSeconds) * Matrix4x4.CreateRotationY((float)stopwatch.Elapsed.TotalSeconds) * Matrix4x4.CreateRotationX((float)stopwatch.Elapsed.TotalSeconds);
+            Graphics.Graphics.Renderer.View(view);
 
-            Matrix4x4 view = Matrix4x4.CreateLookAt(new Vector3(4f, 4f, 4f), new Vector3(0, 0, 0), Vector3.UnitY);
+            Graphics.Graphics.Renderer.Draw(obj);
 
-            Matrix4x4 projection = Matrix4x4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45), Width / Height, 0.1f, 100.0f);
+            Graphics.Graphics.Renderer.Draw(obj2);
 
-            renderer.Model(ref model);
+            Graphics.Graphics.Renderer.Draw(obj3);
 
-            renderer.View(ref view);
-
-            renderer.Projection(ref projection);
+            Graphics.Graphics.Renderer.Draw(obj4);
 
             base.OnRender();
         }
 
-        protected override void OnResize(ResizeEventArgs e)
+        protected void OnResize(int width, int height)
         {
-            Width = e.Width;
-            Height = e.Height;
+            if (height == 0)
+                height = 1;
 
-            GL.Viewport(0, 0, Width, Height);
+            Matrix4x4 projection = Matrix4x4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45), width / height, 0.1f, 100.0f);
 
-            base.OnResize(e);
+            Graphics.Graphics.Renderer.Projection(projection);
         }
+    }
+
+    public class Camera : Actor
+    {
+
     }
 }

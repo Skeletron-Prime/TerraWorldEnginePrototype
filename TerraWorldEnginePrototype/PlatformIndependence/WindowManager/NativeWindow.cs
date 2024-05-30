@@ -1,24 +1,20 @@
-﻿namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
+﻿using TerraWorldEnginePrototype.Core;
+
+namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
 {
     public abstract class NativeWindow
     {
-        private Window window;
+        private readonly Window window;
 
         public event Action? Load;
         public event Action? Update;
         public event Action? Render;
         public event Action? Unload;
 
-        public event Action<ResizeEventArgs>? Resize;
-
-        private Window.WindowSizeCallback? _windowSizeCallBack;
-
-        public NativeWindow(WindowSettings settings)
+        public NativeWindow(WindowSettings settings, Input input)
         {
-            window = Window.Create(settings);
+            window = Window.Create(settings, input);
             window.Show();
-
-            RegisterWindowCallbacks();
         }
 
         public void Run()
@@ -56,26 +52,9 @@
             Unload?.Invoke();
         }
 
-        protected virtual void OnResize(ResizeEventArgs e)
-        {
-            Resize?.Invoke(e);
-        }
-
         public void Dispose()
         {
             window.Dispose();
-        }
-
-        private void WindowSizeCallBack(int width, int height)
-        {
-            OnResize(new ResizeEventArgs(width, height));
-        }
-
-        private void RegisterWindowCallbacks()
-        {
-            _windowSizeCallBack = WindowSizeCallBack;
-
-            window.SetWindowSizeCallback(_windowSizeCallBack);
         }
     }
 }

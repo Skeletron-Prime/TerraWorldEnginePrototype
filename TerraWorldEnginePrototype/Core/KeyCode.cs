@@ -3,7 +3,7 @@
     /// <summary>
     /// Key codes.
     /// </summary>
-    public enum Key
+    public enum KeyCode
     {
         /// <summary>
         /// Not assigned (never returned as the result of a keystroke).
@@ -314,7 +314,7 @@
         /// Home key.
         /// </summary>
         Home = 268,
-        
+
         /// <summary>
         /// End key.
         /// </summary>

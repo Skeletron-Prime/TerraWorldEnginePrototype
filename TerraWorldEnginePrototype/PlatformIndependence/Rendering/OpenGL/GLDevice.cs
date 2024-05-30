@@ -1,30 +1,51 @@
-﻿using TerraWorldEnginePrototype.Core.Mathematics;
-using TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL.Primitives;
+﻿using TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL.Primitives;
+using TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager;
+using TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager.WinWnd;
 
 namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 {
-    public class GLDevice : GraphicsDevice
+    internal class GLDevice : GraphicsDevice
     {
-        public override void Clear()
+        private GLExtension? extension;
+
+        public GLDevice(Window window)
         {
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            InitExtensions(window);
+            SetViewport((int)window.Settings.Size.X, (int)window.Settings.Size.Y);
         }
 
-        public override void Clear(float r, float g, float b, float a)
+        public override void Clear(bool color = true, bool depth = true)
+        {
+            GL.Clear((color ? ClearBufferMask.ColorBufferBit : 0) | (depth ? ClearBufferMask.DepthBufferBit : 0));
+        }
+
+        public override void Clear(float r = 0, float g = 0, float b = 0, float a = 1, bool color = true, bool depth = true)
         {
             GL.ClearColor(r, g, b, a);
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-        }
 
-        public override void Clear(Color color)
-        {
-            GL.ClearColor(color.R, color.G, color.B, color.A);
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            GL.Clear((color ? ClearBufferMask.ColorBufferBit : 0) | (depth ? ClearBufferMask.DepthBufferBit : 0));
         }
 
         public override void SetViewport(int width, int height)
         {
             GL.Viewport(0, 0, width, height);
+        }
+
+        public override void Dispose()
+        {
+            extension!.Dispose();
+        }
+
+        private void InitExtensions(Window window)
+        {
+            if (window is WindowsWindow windowsWindow)
+            {
+                extension = new WGL(windowsWindow);
+            }
+            else
+            {
+                throw new PlatformNotSupportedException("Windows only!");
+            }
         }
     }
 }

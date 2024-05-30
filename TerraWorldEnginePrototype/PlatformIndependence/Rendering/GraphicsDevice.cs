@@ -1,12 +1,10 @@
-﻿using TerraWorldEnginePrototype.Core.Mathematics;
-
-namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering
+﻿namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering
 {
     public abstract class GraphicsDevice
     {
-        public abstract void Clear();
-        public abstract void Clear(float r, float g, float b, float a);
-        public abstract void Clear(Color color);
+        public abstract void Clear(bool color = true, bool depth = true);
+        public abstract void Clear(float r = 0, float g = 0, float b = 0, float a = 1, bool color = true, bool depth = true);
         public abstract void SetViewport(int width, int height);
+        public abstract void Dispose();
     }
 }

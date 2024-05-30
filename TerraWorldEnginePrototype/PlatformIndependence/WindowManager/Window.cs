@@ -1,28 +1,30 @@
 ﻿using System.Runtime.InteropServices;
+using TerraWorldEnginePrototype.Core;
 using TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager.WinWnd;
 
 namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
 {
-    public abstract class Window
+    internal abstract class Window
     {
-        public WindowSettings Settings { get; set; }
+        internal WindowSettings Settings { get; set; }
 
-        public Action? OnPaint;
+        internal Input Input { get; set; }
 
-        public WindowSizeCallback? OnSizeCallback;
+        internal Action? OnPaint;
 
-        public delegate void WindowSizeCallback(int width, int height);
+        internal abstract GraphicsDevice GraphicsDevice { get; set; }
 
-        public Window(WindowSettings windowSettings)
+        internal Window(WindowSettings windowSettings, Input input)
         {
             Settings = windowSettings;
+            Input = input;
         }
 
-        public static Window Create(WindowSettings windowSettings)
+        internal static Window Create(WindowSettings windowSettings, Input input)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                return new WindowsWindow(windowSettings);
+                return new WindowsWindow(windowSettings, input);
             }
             else
             {
@@ -30,20 +32,17 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager
             }
         }
 
-        public abstract void Show();
+        internal abstract void Show();
 
         /// <summary>
         /// Pools for window events.
         /// </summary>
-        public abstract void PoolEvents();
+        internal abstract void PoolEvents();
 
-        public abstract void SwapBuffers();
+        internal abstract void SwapBuffers();
 
-        public abstract void Dispose();
+        internal abstract void Dispose();
 
-        public void SetWindowSizeCallback(WindowSizeCallback callback)
-        {
-            OnSizeCallback = callback;
-        }
+        internal abstract void Invalidate();
     }
 }
