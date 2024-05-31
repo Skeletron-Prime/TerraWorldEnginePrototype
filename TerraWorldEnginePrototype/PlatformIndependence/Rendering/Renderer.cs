@@ -1,6 +1,5 @@
 ﻿using System.Numerics;
 using System.Runtime.InteropServices;
-using TerraWorldEnginePrototype.Core.Mathematics;
 using TerraWorldEnginePrototype.Graphics;
 
 namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering
@@ -19,10 +18,10 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering
             }
         }
 
-        public abstract void Draw(EngineObject mesh);
+        public abstract void DrawScene(Scene scene);
 
-        public abstract void Model(Matrix4x4 model);
-        public abstract void View(Matrix4x4 view);
-        public abstract void Projection(Matrix4x4 projection);
+        protected abstract void Model(Matrix4x4 model);
+        protected abstract void View(Matrix4x4 view);
+        protected abstract void Projection(Matrix4x4 projection);
     }
 }

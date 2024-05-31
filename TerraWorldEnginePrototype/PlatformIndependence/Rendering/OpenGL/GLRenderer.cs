@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using TerraWorldEnginePrototype.Core;
 using TerraWorldEnginePrototype.Core.Mathematics;
 using TerraWorldEnginePrototype.Graphics;
 using TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL.Primitives;
@@ -31,18 +32,37 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             modelLocation = GL.GetUniformLocation(program.Id, "model");
             viewLocation = GL.GetUniformLocation(program.Id, "view");
             projectionLocation = GL.GetUniformLocation(program.Id, "projection");
+
+            GL.Enable(EnableCap.DepthTest);
         }
 
-
-        public override void Draw(EngineObject eo)
+        public override void DrawScene(Scene scene)
         {
-            UploadMesh(eo.Mesh);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            vertexArray.Bind();
+            foreach (var engineObject in scene.SceneGraph)
+            {
+                if (engineObject.Value is GameObject gameObject)
+                {
+                    Draw(gameObject);
+                }
+            }
 
-            Model(Matrix4x4.CreateFromQuaternion(eo.Transform.Rotation) * Matrix4x4.CreateTranslation(eo.Transform.Position) * Matrix4x4.CreateScale(eo.Transform.Scale));
+            View(scene.CurrentCamera.ViewMatrix);
+            Projection(scene.CurrentCamera.ProjectionMatrix);
+        }
 
-            GL.DrawArrays(DrawMode.Triangles, 0, eo.Mesh.Vertices.Length);
+        private void Draw(GameObject gameObject)
+        {
+            if (gameObject.Mesh == null)
+                return;
+
+            UploadMesh(gameObject.Mesh);
+
+            Model(gameObject.Transform.GetModelMatrix());
+
+            GL.DrawArrays(DrawMode.Triangles, 0, gameObject.Mesh.VertexCount);
+
         }
 
         private void UploadMesh(Mesh mesh)
@@ -80,17 +100,17 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 
         #region MVP Matrix
 
-        public override void Model(Matrix4x4 model)
+        protected override void Model(Matrix4x4 model)
         {
             GL.UniformMatrix4(modelLocation, false, ref model);
         }
 
-        public override void View(Matrix4x4 view)
+        protected override void View(Matrix4x4 view)
         {
             GL.UniformMatrix4(viewLocation, false, ref view);
         }
 
-        public override void Projection(Matrix4x4 projection)
+        protected override void Projection(Matrix4x4 projection)
         {
             GL.UniformMatrix4(projectionLocation, false, ref projection);
         }

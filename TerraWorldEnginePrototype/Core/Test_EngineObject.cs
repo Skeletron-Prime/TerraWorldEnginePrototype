@@ -1,11 +1,9 @@
 ﻿using System.Numerics;
 using TerraWorldEnginePrototype.Core.Mathematics;
+using TerraWorldEnginePrototype.Graphics;
 
 namespace TerraWorldEnginePrototype.Core
 {
-    /// <summary>
-    /// Class Object is a base class for all classes in the TerraWorld Engine, so it is the root of the class hierarchy.
-    /// </summary>
     public class Test_EngineObject
     {
         /// <summary>
@@ -16,12 +14,7 @@ namespace TerraWorldEnginePrototype.Core
         /// <summary>
         /// The ID of the object.
         /// </summary>
-        private readonly int id;
-
-        /// <summary>
-        /// The ID of the object.
-        /// </summary>
-        public int ID => id;
+        public int ID { get; } = NextID++;
 
         /// <summary>
         /// The name of the object.
@@ -45,7 +38,6 @@ namespace TerraWorldEnginePrototype.Core
         /// <param name="description">The description of created object.</param>
         public Test_EngineObject(string? name, string? description)
         {
-            id = NextID++;
             Name = name ?? "New" + GetType().Name;
             Description = description ?? "New" + GetType().Name + "object";
         }
@@ -129,88 +121,6 @@ namespace TerraWorldEnginePrototype.Core
             {
                 throw new NullReferenceException(name);
             }
-        }
-    }
-
-    /// <summary>
-    /// Class GameObject is a base class for all objects in the TerraWorld Engine that can be placed in the scene.
-    /// </summary>
-    public class Test_GameObject : Test_EngineObject
-    {
-        private readonly List<Component> components = [];
-
-        public List<Component> Components => components;
-
-        public Test_GameObject(string name = "NewGameObject", string description = "New GameObject") : base(name, description) { }
-
-        public void AddComponent<T>() where T : Component
-        {
-            T component = (T)Activator.CreateInstance(typeof(T));
-            component.AttachToGameObject(this);
-
-            components.Add(component);
-        }
-
-        public T? GetComponent<T>() where T : Component
-        {
-            foreach (var component in components)
-            {
-                if (component is T comp)
-                {
-                    return comp;
-                }
-            }
-
-            return null;
-        }
-    }
-
-    /// <summary>
-    /// Class Component is a base class for all components in the TerraWorld Engine.
-    /// </summary>
-    public class Component : Test_EngineObject
-    {
-        private Test_GameObject? gameObject;
-
-        public Test_GameObject? GameObject => gameObject;
-
-        public Component(string name = "NewComponent", string description = "New Component") : base(name, description) { }
-
-        public void AttachToGameObject(Test_GameObject gameObject)
-        {
-            this.gameObject = gameObject;
-        }
-    }
-
-    /// <summary>
-    /// Class Actor is a base class for all classes, which permanently act in the scene and should be updated.
-    /// </summary>
-    public class Actor : Test_EngineObject
-    {
-        public Actor(string name = "NewActor", string description = "New Actor") : base(name, description) { }
-
-        public virtual void Start() { }
-        public virtual void Update() { }
-        public virtual void PhysicsUpdate() { }
-        public virtual void OnRenderObject() { }
-        public virtual void OnDestroy() { }
-    }
-
-    /// <summary>
-    /// Class MeshRenderer is a class that renders a mesh in the main scene.
-    /// </summary>
-    public class MeshRenderer : Actor
-    {
-        public Mesh mesh;
-
-        public MeshRenderer(Mesh mesh, string name = "NewMeshRenderer", string description = "New Mesh Renderer") : base(name, description)
-        {
-            this.mesh = mesh;
-        }
-
-        public override void OnRenderObject()
-        {
-
         }
     }
 }
