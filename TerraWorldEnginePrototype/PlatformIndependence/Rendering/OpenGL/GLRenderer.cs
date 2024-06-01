@@ -11,6 +11,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         private readonly GLProgram program;
         private readonly VertexArray vertexArray;
         private readonly GLBuffer<Vertex> vertexBuffer;
+        private readonly GLBuffer<uint> indexBuffer;
 
         private readonly int modelLocation;
         private readonly int viewLocation;
@@ -21,6 +22,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             program = new GLProgram();
             vertexArray = new VertexArray();
             vertexBuffer = new GLBuffer<Vertex>();
+            indexBuffer = new GLBuffer<uint>();
 
             program.AddShader(ShaderType.VertexShader, "PlatformIndependence\\Rendering\\OpenGL\\Shaders\\VertexShader3D.glsl");
             program.AddShader(ShaderType.FragmentShader, "PlatformIndependence\\Rendering\\OpenGL\\Shaders\\FragmentShader3D.glsl");
@@ -61,8 +63,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 
             Model(gameObject.Transform.GetModelMatrix());
 
-            GL.DrawArrays(DrawMode.Triangles, 0, gameObject.Mesh.VertexCount);
-
+            GL.DrawElements(DrawMode.Triangles, gameObject.Mesh.IndexCount, DataType.UnsignedInt, 0);
         }
 
         private void UploadMesh(Mesh mesh)
@@ -72,6 +73,9 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 
             if (mesh.VertexCount == 0)
                 throw new Exception("Mesh has no vertices!");
+
+            if (mesh.IndexCount == 0)
+                throw new Exception("Mesh has no indices!");
 
             var vertices = new Vertex[mesh.VertexCount];
 
@@ -88,12 +92,16 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 
             vertexBuffer.BufferData(vertices, BufferType.ArrayBuffer, BufferUsage.StaticDraw);
 
+            indexBuffer.BufferData(mesh.Indices, BufferType.ElementArrayBuffer, BufferUsage.StaticDraw);
+
             vertexArray.AddAttribute3f();
             vertexArray.AddAttribute4f();
 
             vertexArray.Build(vertexBuffer);
 
             vertexArray.Bind();
+
+            indexBuffer.Bind(BufferType.ElementArrayBuffer);
 
             mesh.IsChanged = false;
         }

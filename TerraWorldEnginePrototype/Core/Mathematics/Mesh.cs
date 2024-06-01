@@ -10,6 +10,7 @@ namespace TerraWorldEnginePrototype.Core.Mathematics
 
         private Vector3[]? vertices;
         private Color[]? colors;
+        private uint[]? indices;
 
         public Vector3[] Vertices
         {
@@ -36,6 +37,12 @@ namespace TerraWorldEnginePrototype.Core.Mathematics
             set => WriteVertexData(ref colors, value, value.Length);
         }
 
+        public uint[] Indices
+        {
+            get => ReadVertexData(indices ?? []);
+            set => WriteVertexData(ref indices, value, value.Length, false);
+        }
+
         public bool IsChanged
         {
             get => isChanged;
@@ -43,6 +50,7 @@ namespace TerraWorldEnginePrototype.Core.Mathematics
         }
 
         public int VertexCount => vertices?.Length ?? 0;
+        public int IndexCount => indices?.Length ?? 0;
 
         public bool HasColors => (colors?.Length ?? 0) > 0;
 
@@ -58,14 +66,14 @@ namespace TerraWorldEnginePrototype.Core.Mathematics
             return value;
         }
 
-        private void WriteVertexData<T>(ref T target, T value, int length)
+        private void WriteVertexData<T>(ref T target, T value, int length, bool mustMatchLength = true)
         {
             if (!IsWriteable)
             {
-                throw new System.Exception("Mesh is not writeable");
+                throw new Exception("Mesh is not writeable");
             }
 
-            if (value == null || length <= 0 || length != (vertices?.Length ?? 0))
+            if (value == null || length <= 0 || length != (vertices?.Length ?? 0) && mustMatchLength)
             {
                 throw new Exception("Array length should match vertices length");
             }
