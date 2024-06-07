@@ -25,7 +25,6 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
                 Size = 3,
                 Type = DataType.Float,
                 Normalized = false,
-                Stride = 3
             });
         }
 
@@ -37,19 +36,6 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
                 Size = 4,
                 Type = DataType.Float,
                 Normalized = false,
-                Stride = 4
-            });
-        }
-
-        public void AddAttribute16f()
-        {
-            Attributes.Add(new VertexAttribute
-            {
-                Index = (uint)Attributes.Count,
-                Size = 4,
-                Type = DataType.Float,
-                Normalized = false,
-                Stride = 16
             });
         }
 
@@ -64,29 +50,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 
             foreach (var attribute in Attributes)
             {
-                switch (attribute.Type)
-                {
-                    case DataType.Byte:
-                    case DataType.UnsignedByte:
-                        stride += sizeof(byte) * attribute.Stride;
-                        break;
-                    case DataType.Short:
-                    case DataType.UnsignedShort:
-                        stride += sizeof(ushort) * attribute.Stride;
-                        break;
-                    case DataType.Int:
-                    case DataType.UnsignedInt:
-                        stride += sizeof(int) * attribute.Stride;
-                        break;
-                    case DataType.Float:
-                        stride += sizeof(float) * attribute.Stride;
-                        break;
-                    case DataType.Double:
-                        stride += sizeof(double) * attribute.Stride;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                stride += sizeof(float) * attribute.Size;
             }
 
             foreach (var (index, size, type, normalized) in Attributes)
@@ -94,29 +58,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
                 GL.VertexAttribPointer(index, size, type, normalized, stride, offset);
                 GL.EnableVertexAttribArray(index);
 
-                switch (type)
-                {
-                    case DataType.Byte:
-                    case DataType.UnsignedByte:
-                        offset += sizeof(byte) * size;
-                        break;
-                    case DataType.Short:
-                    case DataType.UnsignedShort:
-                        offset += sizeof(ushort) * size;
-                        break;
-                    case DataType.Int:
-                    case DataType.UnsignedInt:
-                        offset += sizeof(int) * size;
-                        break;
-                    case DataType.Float:
-                        offset += sizeof(float) * size;
-                        break;
-                    case DataType.Double:
-                        offset += sizeof(double) * size;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                offset += sizeof(float) * size;
             }
 
             GL.BindVertexArray(0);
@@ -148,9 +90,6 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             public int Size { get; set; }
             public DataType Type { get; set; }
             public bool Normalized { get; set; }
-            public int Stride { get; set; }
-
-            //deconstructor
 
             public void Deconstruct(out uint index, out int size, out DataType type, out bool normalized)
             {

@@ -1,5 +1,4 @@
-﻿using TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL.Primitives;
-using TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager;
+﻿using TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager;
 using TerraWorldEnginePrototype.PlatformIndependence.Rendering.WindowManager.WinWnd;
 
 namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
