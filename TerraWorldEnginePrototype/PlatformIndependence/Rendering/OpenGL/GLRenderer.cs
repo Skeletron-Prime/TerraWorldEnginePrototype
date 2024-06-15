@@ -9,9 +9,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
     internal class GLRenderer : Renderer
     {
         private readonly GLProgram program;
-        private readonly VertexArray vertexArray;
-        private readonly GLBuffer<Vertex> vertexBuffer;
-        private readonly GLBuffer<uint> indexBuffer;
+        private readonly BufferManager bufferManager;
 
         private readonly int modelLocation;
         private readonly int viewLocation;
@@ -20,9 +18,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         public GLRenderer()
         {
             program = new GLProgram();
-            vertexArray = new VertexArray();
-            vertexBuffer = new GLBuffer<Vertex>();
-            indexBuffer = new GLBuffer<uint>();
+            bufferManager = new BufferManager();
 
             program.AddShader(ShaderType.VertexShader, "PlatformIndependence\\Rendering\\OpenGL\\Shaders\\VertexShader3D.glsl");
             program.AddShader(ShaderType.FragmentShader, "PlatformIndependence\\Rendering\\OpenGL\\Shaders\\FragmentShader3D.glsl");
@@ -56,9 +52,6 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 
         private void Draw(GameObject gameObject)
         {
-            if (gameObject.Mesh == null)
-                return;
-
             UploadMesh(gameObject.Mesh);
 
             Model(gameObject.Transform.GetModelMatrix());
@@ -68,8 +61,17 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 
         private void UploadMesh(Mesh mesh)
         {
-            if (!mesh.IsChanged)
+            if (bufferManager.Contains(mesh))
+            {
+                var (vertexArrayObject, _, indexBufferObject) = bufferManager.GetBuffer(mesh);
+
+                vertexArrayObject.Bind();
+                indexBufferObject.Bind(BufferType.ElementArrayBuffer);
+
                 return;
+            }
+
+            var (vertexArray, vertexBuffer, indexBuffer) = bufferManager.GetBuffer(mesh);
 
             if (mesh.VertexCount == 0)
                 throw new Exception("Mesh has no vertices!");
@@ -88,6 +90,8 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 
                 if (mesh.HasColors)
                     vertices[i].Color = mesh.Colors[i];
+                else
+                    vertices[i].Color = Color.White;
             }
 
             vertexBuffer.BufferData(vertices, BufferType.ArrayBuffer, BufferUsage.StaticDraw);
@@ -102,8 +106,6 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             vertexArray.Bind();
 
             indexBuffer.Bind(BufferType.ElementArrayBuffer);
-
-            mesh.IsChanged = false;
         }
 
         #region MVP Matrix
@@ -125,10 +127,34 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 
         #endregion
 
-        private struct Vertex
+        public struct Vertex
         {
             public Vector3 Location;
             public Color Color;
+        }
+    }
+
+    internal class BufferManager
+    {
+        private readonly Dictionary<Mesh, (VertexArray, GLBuffer<GLRenderer.Vertex>, GLBuffer<uint>)> buffers = [];
+
+        public (VertexArray, GLBuffer<GLRenderer.Vertex>, GLBuffer<uint>) GetBuffer(Mesh mesh)
+        {
+            if (buffers.ContainsKey(mesh))
+                return buffers[mesh];
+
+            var vertexArray = new VertexArray();
+            var vertexBuffer = new GLBuffer<GLRenderer.Vertex>();
+            var indexBuffer = new GLBuffer<uint>();
+
+            buffers.Add(mesh, (vertexArray, vertexBuffer, indexBuffer));
+
+            return (vertexArray, vertexBuffer, indexBuffer);
+        }
+
+        public bool Contains(Mesh mesh)
+        {
+            return buffers.ContainsKey(mesh);
         }
     }
 }

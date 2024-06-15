@@ -88,31 +88,10 @@ namespace TerraWorldEnginePrototype.Graphics
             Children = new LinkedList<GraphNode<T>>();
         }
 
-        public void AddChild(T value)
-        {
-            AddChild(new GraphNode<T>(value, this));
-        }
-
         public void AddChild(GraphNode<T> child)
         {
             Children.AddLast(child);
             child.Parent = this;
-        }
-
-        public void RemoveChild(GraphNode<T> child)
-        {
-            Children.Remove(child);
-            child.Parent = null;
-        }
-
-        public bool IsRoot()
-        {
-            return Parent == null;
-        }
-
-        public bool IsLeaf()
-        {
-            return Children.Count == 0;
         }
 
         public GraphNode<T>? FindNodeById(int id)

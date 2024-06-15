@@ -1,10 +1,9 @@
-﻿using System.Numerics;
+﻿using Assimp;
+using System.Numerics;
 namespace TerraWorldEnginePrototype.Core.Mathematics
 {
     public class Mesh
     {
-        private bool isChanged = true;
-
         public readonly bool IsWriteable = true;
         public readonly bool IsReadable = true;
 
@@ -22,7 +21,6 @@ namespace TerraWorldEnginePrototype.Core.Mathematics
 
                 var needChange = vertices == null || vertices.Length != value.Length;
                 vertices = value;
-                isChanged = true;
 
                 if (needChange)
                 {
@@ -41,12 +39,6 @@ namespace TerraWorldEnginePrototype.Core.Mathematics
         {
             get => ReadVertexData(indices ?? []);
             set => WriteVertexData(ref indices, value, value.Length, false);
-        }
-
-        public bool IsChanged
-        {
-            get => isChanged;
-            set => isChanged = value;
         }
 
         public int VertexCount => vertices?.Length ?? 0;
@@ -78,8 +70,48 @@ namespace TerraWorldEnginePrototype.Core.Mathematics
                 throw new Exception("Array length should match vertices length");
             }
 
-            isChanged = true;
             target = value;
+        }
+    }
+
+    public class MeshLoader
+    {
+        public static Mesh Load(string path)
+        {
+            // Load mesh using assimp 
+            var context = new AssimpContext();
+
+            var scene = context.ImportFile(path, PostProcessSteps.Triangulate | PostProcessSteps.GenerateSmoothNormals);
+
+            if (scene == null || scene.SceneFlags == SceneFlags.Incomplete)
+            {
+                throw new Exception("Failed to load mesh");
+            }
+
+            var vertices = new List<Vector3>();
+            var indices = new List<uint>();
+
+            foreach (var mesh in scene.Meshes)
+            {
+                foreach (var vertex in mesh.Vertices)
+                {
+                    vertices.Add(new Vector3(vertex.X, vertex.Y, vertex.Z));
+                }
+
+                foreach (var face in mesh.Faces)
+                {
+                    foreach (var index in face.Indices)
+                    {
+                        indices.Add((uint)index);
+                    }
+                }
+            }
+
+            return new Mesh
+            {
+                Vertices = vertices.ToArray(),
+                Indices = indices.ToArray()
+            };
         }
     }
 }
