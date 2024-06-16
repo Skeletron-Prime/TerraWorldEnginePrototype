@@ -8,6 +8,7 @@ namespace TerraWorldEnginePrototype.Core.Mathematics
         public readonly bool IsReadable = true;
 
         private Vector3[]? vertices;
+        private Vector3[]? normals;
         private Color[]? colors;
         private uint[]? indices;
 
@@ -29,6 +30,12 @@ namespace TerraWorldEnginePrototype.Core.Mathematics
             }
         }
 
+        public Vector3[] Normals
+        {
+            get => ReadVertexData(normals ?? []);
+            set => WriteVertexData(ref normals, value, value.Length);
+        }
+
         public Color[] Colors
         {
             get => ReadVertexData(colors ?? []);
@@ -45,6 +52,7 @@ namespace TerraWorldEnginePrototype.Core.Mathematics
         public int IndexCount => indices?.Length ?? 0;
 
         public bool HasColors => (colors?.Length ?? 0) > 0;
+        public bool HasNormals => (normals?.Length ?? 0) > 0;
 
         public Mesh() { }
 
@@ -90,6 +98,7 @@ namespace TerraWorldEnginePrototype.Core.Mathematics
 
             var vertices = new List<Vector3>();
             var indices = new List<uint>();
+            var normals = new List<Vector3>();
 
             foreach (var mesh in scene.Meshes)
             {
@@ -105,12 +114,18 @@ namespace TerraWorldEnginePrototype.Core.Mathematics
                         indices.Add((uint)index);
                     }
                 }
+
+                foreach (var normal in mesh.Normals)
+                {
+                    normals.Add(new Vector3(normal.X, normal.Y, normal.Z));
+                }
             }
 
             return new Mesh
             {
                 Vertices = vertices.ToArray(),
-                Indices = indices.ToArray()
+                Indices = indices.ToArray(),
+                Normals = normals.ToArray()
             };
         }
     }

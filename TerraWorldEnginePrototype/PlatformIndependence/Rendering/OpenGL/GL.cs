@@ -11,6 +11,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
     internal static class GL
     {
         #region Initialization
+
         static GL()
         {
             GetProcAddress = GetProcAddressFunction();
@@ -57,6 +58,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             LoadFunction(out glTexParameteri, nameof(glTexParameteri));
             LoadFunction(out glTexSubImage2D, nameof(glTexSubImage2D));
             LoadFunction(out glUseProgram, nameof(glUseProgram));
+            LoadFunction(out glUniform3f, nameof(glUniform3f));
             LoadFunction(out glUniform4f, nameof(glUniform4f));
             LoadFunction(out glUniformMatrix4fv, nameof(glUniformMatrix4fv));
             LoadFunction(out glVertexAttribPointer, nameof(glVertexAttribPointer));
@@ -676,6 +678,19 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         internal static void UseProgram(uint program)
         {
             glUseProgram(program);
+            CheckErrors();
+        }
+
+        #endregion
+
+        #region Uniform 3 Float
+
+        delegate void Uniform3fDelegate(int location, float v0, float v1, float v2);
+        static readonly Uniform3fDelegate glUniform3f;
+
+        internal static void Uniform3f(int location, float v0, float v1, float v2)
+        {
+            glUniform3f(location, v0, v1, v2);
             CheckErrors();
         }
 

@@ -14,6 +14,10 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         private readonly int modelLocation;
         private readonly int viewLocation;
         private readonly int projectionLocation;
+        
+        private readonly int lightPositionLocation;
+        private readonly int lightColorLocation;
+        private readonly int viewPositionLocation;
 
         public GLRenderer()
         {
@@ -31,6 +35,10 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             viewLocation = GL.GetUniformLocation(program.Id, "view");
             projectionLocation = GL.GetUniformLocation(program.Id, "projection");
 
+            lightPositionLocation = GL.GetUniformLocation(program.Id, "lightPosition");
+            lightColorLocation = GL.GetUniformLocation(program.Id, "lightColor");
+            viewPositionLocation = GL.GetUniformLocation(program.Id, "viewPosition");
+
             GL.Enable(EnableCap.DepthTest);
         }
 
@@ -44,7 +52,14 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
                 {
                     Draw(gameObject);
                 }
+                else if (engineObject.Value is PointLight pointLight)
+                {
+                    GL.Uniform3f(lightPositionLocation, pointLight.Position.X, pointLight.Position.Y, pointLight.Position.Z);
+                    GL.Uniform3f(lightColorLocation, pointLight.Color.R, pointLight.Color.G, pointLight.Color.B);
+                }
             }
+
+            GL.Uniform3f(viewPositionLocation, scene.CurrentCamera.Transform.Position.X, scene.CurrentCamera.Transform.Position.Y, scene.CurrentCamera.Transform.Position.Z);
 
             View(scene.CurrentCamera.ViewMatrix);
             Projection(scene.CurrentCamera.ProjectionMatrix);
@@ -88,16 +103,26 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
                     Location = mesh.Vertices[i],
                 };
 
+                if (mesh.HasNormals)
+                {
+                    vertices[i].Normal = mesh.Normals[i];
+                }
+
                 if (mesh.HasColors)
+                {
                     vertices[i].Color = mesh.Colors[i];
+                }
                 else
+                {
                     vertices[i].Color = Color.White;
+                }
             }
 
             vertexBuffer.BufferData(vertices, BufferType.ArrayBuffer, BufferUsage.StaticDraw);
 
             indexBuffer.BufferData(mesh.Indices, BufferType.ElementArrayBuffer, BufferUsage.StaticDraw);
 
+            vertexArray.AddAttribute3f();
             vertexArray.AddAttribute3f();
             vertexArray.AddAttribute4f();
 
@@ -130,6 +155,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         public struct Vertex
         {
             public Vector3 Location;
+            public Vector3 Normal;
             public Color Color;
         }
     }

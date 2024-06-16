@@ -13,13 +13,21 @@ namespace TerraWorldEnginePrototype.Core
 
         protected override void OnLoad()
         {
-            //CubeObject cube = new CubeObject(new Transform()
-            //{
-            //    Position = new Vector3(0, -2, 0),
-            //    Rotation = Quaternion.Normalize(Quaternion.CreateFromAxisAngle(Vector3.UnitX, MathHelper.DegreesToRadians(45f)) * Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathHelper.DegreesToRadians(45f)) * Quaternion.CreateFromAxisAngle(Vector3.UnitZ, MathHelper.DegreesToRadians(45f)))
-            //});
+            CubeObject cube = new CubeObject(new Transform()
+            {
+                Position = new Vector3(-2, -2, -2),
+                Rotation = Quaternion.Normalize(Quaternion.CreateFromAxisAngle(Vector3.UnitX, MathHelper.DegreesToRadians(45f)) * Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathHelper.DegreesToRadians(45f)) * Quaternion.CreateFromAxisAngle(Vector3.UnitZ, MathHelper.DegreesToRadians(45f)))
+            });
 
-            //Scene.AddObject(cube);
+            Scene.AddObject(cube);
+
+            CubeObject cube2 = new CubeObject(new Transform()
+            {
+                Position = new Vector3(7, 7, 7),
+                Rotation = Quaternion.Normalize(Quaternion.CreateFromAxisAngle(Vector3.UnitX, MathHelper.DegreesToRadians(45f)) * Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathHelper.DegreesToRadians(45f)) * Quaternion.CreateFromAxisAngle(Vector3.UnitZ, MathHelper.DegreesToRadians(45f)))
+            });
+
+            Scene.AddObject(cube2);
 
             //TetrahedronObject tetrahedronObject = new TetrahedronObject(new Transform()
             //{
@@ -33,6 +41,14 @@ namespace TerraWorldEnginePrototype.Core
             GameObject monkey = new GameObject(mesh);
 
             Scene.AddObject(monkey);
+
+            //DirectionalLight light = new DirectionalLight(Color.White, -Vector3.UnitY, new Vector3(0, 1, 0));
+
+            //Scene.AddObject(light);
+
+            PointLight pointLight = new PointLight(Color.White, new Vector3(0, 100, 0));
+
+            Scene.AddObject(pointLight);
 
             base.OnLoad();
         }

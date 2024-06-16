@@ -9,14 +9,14 @@ namespace TerraWorldEnginePrototype.Core
         {
             Vertices =
             [
-                new Vector3(-1f, -1f, -1f),
-                new Vector3(1f, -1f, -1f),
-                new Vector3(1f, 1f, -1f),
-                new Vector3(-1f, 1f, -1f),
-                new Vector3(-1f, -1f, 1f),
-                new Vector3(1f, -1f, 1f),
-                new Vector3(1f, 1f, 1f),
-                new Vector3(-1f, 1f, 1f)
+                new Vector3(-0.5f, -0.5f, -0.5f), // 0
+                new Vector3(0.5f, -0.5f, -0.5f), // 1
+                new Vector3(0.5f, 0.5f, -0.5f), // 2
+                new Vector3(-0.5f, 0.5f, -0.5f), // 3
+                new Vector3(-0.5f, -0.5f, 0.5f), // 4
+                new Vector3(0.5f, -0.5f, 0.5f), // 5
+                new Vector3(0.5f, 0.5f, 0.5f), // 6
+                new Vector3(-0.5f, 0.5f, 0.5f) // 7
             ],
 
             Colors =
@@ -29,6 +29,18 @@ namespace TerraWorldEnginePrototype.Core
                 Color.Cyan,
                 Color.White,
                 Color.Black
+            ],
+
+            Normals =
+            [
+                new Vector3(-0.577f, -0.577f, -0.577f), // 0
+                new Vector3(0.577f, -0.577f, -0.577f), // 1
+                new Vector3(0.577f, 0.577f, -0.577f), // 2
+                new Vector3(-0.577f, 0.577f, -0.577f), // 3
+                new Vector3(-0.577f, -0.577f, 0.577f), // 4
+                new Vector3(0.577f, -0.577f, 0.577f), // 5
+                new Vector3(0.577f, 0.577f, 0.577f), // 6
+                new Vector3(-0.577f, 0.577f, 0.577f) // 7
             ],
 
             Indices =

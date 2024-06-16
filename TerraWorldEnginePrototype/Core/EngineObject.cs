@@ -1,4 +1,5 @@
-﻿using TerraWorldEnginePrototype.Core.Mathematics;
+﻿using System.Numerics;
+using TerraWorldEnginePrototype.Core.Mathematics;
 
 namespace TerraWorldEnginePrototype.Core
 {
@@ -41,6 +42,38 @@ namespace TerraWorldEnginePrototype.Core
         {
             Mesh = mesh;
             Transform = new Transform();
+        }
+    }
+
+    public class Light : EngineObject
+    {
+        public Color Color { get; set; }
+
+        public Light(Color color)
+        {
+            Color = color;
+        }
+    }
+
+    public class DirectionalLight : Light
+    {
+        public Vector3 Direction { get; set; }
+        public Vector3 Position { get; set; }
+
+        public DirectionalLight(Color color, Vector3 direction, Vector3 position) : base(color)
+        {
+            Direction = direction;
+            Position = position;
+        }
+    }
+
+    public class PointLight : Light
+    {
+        public Vector3 Position { get; set; }
+
+        public PointLight(Color color, Vector3 position) : base(color)
+        {
+            Position = position;
         }
     }
 }
