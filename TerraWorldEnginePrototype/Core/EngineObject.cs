@@ -47,33 +47,20 @@ namespace TerraWorldEnginePrototype.Core
 
     public class Light : EngineObject
     {
+        public Transform Transform { get; set; }
         public Color Color { get; set; }
+        public float Intensity { get; set; }
 
-        public Light(Color color)
+        public Light(Transform transform, Color color, float intensity)
         {
+            Transform = transform;
             Color = color;
-        }
-    }
-
-    public class DirectionalLight : Light
-    {
-        public Vector3 Direction { get; set; }
-        public Vector3 Position { get; set; }
-
-        public DirectionalLight(Color color, Vector3 direction, Vector3 position) : base(color)
-        {
-            Direction = direction;
-            Position = position;
+            Intensity = intensity;
         }
     }
 
     public class PointLight : Light
     {
-        public Vector3 Position { get; set; }
-
-        public PointLight(Color color, Vector3 position) : base(color)
-        {
-            Position = position;
-        }
+        public PointLight(Vector3 position, Color color, float intensity) : base(new Transform() { Position = position}, color, intensity) { }
     }
 }

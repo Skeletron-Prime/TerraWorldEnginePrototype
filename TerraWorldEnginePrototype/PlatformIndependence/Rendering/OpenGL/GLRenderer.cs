@@ -10,19 +10,21 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
     {
         private readonly GLProgram program;
         private readonly BufferManager bufferManager;
+        private readonly GLBuffer<Light> lightBuffer;
+
+        private readonly List<Light> lights = [];
 
         private readonly int modelLocation;
         private readonly int viewLocation;
         private readonly int projectionLocation;
         
-        private readonly int lightPositionLocation;
-        private readonly int lightColorLocation;
         private readonly int viewPositionLocation;
 
         public GLRenderer()
         {
             program = new GLProgram();
             bufferManager = new BufferManager();
+            lightBuffer = new GLBuffer<Light>();
 
             program.AddShader(ShaderType.VertexShader, "PlatformIndependence\\Rendering\\OpenGL\\Shaders\\VertexShader3D.glsl");
             program.AddShader(ShaderType.FragmentShader, "PlatformIndependence\\Rendering\\OpenGL\\Shaders\\FragmentShader3D.glsl");
@@ -35,8 +37,6 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             viewLocation = GL.GetUniformLocation(program.Id, "view");
             projectionLocation = GL.GetUniformLocation(program.Id, "projection");
 
-            lightPositionLocation = GL.GetUniformLocation(program.Id, "lightPosition");
-            lightColorLocation = GL.GetUniformLocation(program.Id, "lightColor");
             viewPositionLocation = GL.GetUniformLocation(program.Id, "viewPosition");
 
             GL.Enable(EnableCap.DepthTest);
@@ -52,10 +52,9 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
                 {
                     Draw(gameObject);
                 }
-                else if (engineObject.Value is PointLight pointLight)
+                else if (engineObject.Value is Core.Light light)
                 {
-                    GL.Uniform3f(lightPositionLocation, pointLight.Position.X, pointLight.Position.Y, pointLight.Position.Z);
-                    GL.Uniform3f(lightColorLocation, pointLight.Color.R, pointLight.Color.G, pointLight.Color.B);
+                    Draw(light);
                 }
             }
 
@@ -72,6 +71,25 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             Model(gameObject.Transform.GetModelMatrix());
 
             GL.DrawElements(DrawMode.Triangles, gameObject.Mesh.IndexCount, DataType.UnsignedInt, 0);
+        }
+
+        private void Draw(Core.Light light)
+        {
+            Light lightsource = new Light
+            {
+                Position = light.Transform.Position,
+                Color = light.Color,
+                Intensity = light.Intensity
+            };
+
+            if (!lights.Contains(lightsource))
+            {
+                lights.Add(lightsource);
+            }
+
+            lightBuffer.BufferData(lights.ToArray(), BufferType.ShaderStorageBuffer, BufferUsage.DynamicDraw);
+
+            GL.BindBufferBase(BufferType.ShaderStorageBuffer, 0, lightBuffer.Id);
         }
 
         private void UploadMesh(Mesh mesh)
@@ -157,6 +175,13 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             public Vector3 Location;
             public Vector3 Normal;
             public Color Color;
+        }
+
+        public struct Light
+        {
+            public Vector3 Position;
+            public Color Color;
+            public float Intensity;
         }
     }
 

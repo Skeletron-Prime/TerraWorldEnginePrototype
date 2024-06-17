@@ -46,9 +46,14 @@ namespace TerraWorldEnginePrototype.Core
 
             //Scene.AddObject(light);
 
-            PointLight pointLight = new PointLight(Color.White, new Vector3(0, 100, 0));
-
+            PointLight pointLight = new PointLight(new Vector3(-10, 10, 0), Color.White, 1.0f);
             Scene.AddObject(pointLight);
+
+            PointLight pointLight2 = new PointLight(new Vector3(10, 10, 0), Color.White, 1.0f);
+            Scene.AddObject(pointLight2);
+
+            PointLight pointLight3 = new PointLight(new Vector3(0, 10, 10), Color.White, 0.5f);
+            Scene.AddObject(pointLight3);
 
             base.OnLoad();
         }

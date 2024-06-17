@@ -7,6 +7,7 @@
         UniformBuffer = 0x8A11,
         StorageBuffer = 0x90D2,
         ElementArrayBuffer = 0x8893,
-        ArrayBuffer = 0x8892
+        ArrayBuffer = 0x8892,
+        ShaderStorageBuffer = 0x90D2,
     }
 }

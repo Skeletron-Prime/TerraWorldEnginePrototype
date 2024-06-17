@@ -19,6 +19,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             LoadFunction(out glClearColor, nameof(glClearColor));
             LoadFunction(out glClear, nameof(glClear));
             LoadFunction(out glBindBuffer, nameof(glBindBuffer));
+            LoadFunction(out glBindBufferBase, nameof(glBindBufferBase));
             LoadFunction(out glBindTexture, nameof(glBindTexture));
             LoadFunction(out glBufferSubData, nameof(glBufferSubData));
             LoadFunction(out glActiveTexture, nameof(glActiveTexture));
@@ -143,6 +144,19 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         internal static void BindBuffer(BufferType target, uint buffer)
         {
             glBindBuffer((uint)target, buffer);
+            CheckErrors();
+        }
+
+        #endregion
+
+        #region Bind Buffer Base
+
+        delegate void BindBufferBaseDelegate(uint target, uint index, uint buffer);
+        static readonly BindBufferBaseDelegate glBindBufferBase;
+
+        internal static void BindBufferBase(BufferType target, uint index, uint buffer)
+        {
+            glBindBufferBase((uint)target, index, buffer);
             CheckErrors();
         }
 

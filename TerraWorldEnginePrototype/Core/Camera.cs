@@ -6,7 +6,7 @@ namespace TerraWorldEnginePrototype.Core
     {
         public Transform Transform { get; set; } = new Transform()
         {
-            Position = new Vector3(0, 0, 5),
+            Position = new Vector3(0, 0, 25),
             Rotation = Quaternion.Identity
         };
         public Matrix4x4 ProjectionMatrix { get; set; }
