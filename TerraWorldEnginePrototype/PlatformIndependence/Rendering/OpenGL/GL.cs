@@ -20,6 +20,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             LoadFunction(out glClear, nameof(glClear));
             LoadFunction(out glBindBuffer, nameof(glBindBuffer));
             LoadFunction(out glBindBufferBase, nameof(glBindBufferBase));
+            LoadFunction(out glBindFramebuffer, nameof(glBindFramebuffer));
             LoadFunction(out glBindTexture, nameof(glBindTexture));
             LoadFunction(out glBufferSubData, nameof(glBufferSubData));
             LoadFunction(out glActiveTexture, nameof(glActiveTexture));
@@ -36,11 +37,14 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             LoadFunction(out glDeleteTextures, nameof(glDeleteTextures));
             LoadFunction(out glDeleteVertexArrays, nameof(glDeleteVertexArrays));
             LoadFunction(out glDrawArrays, nameof(glDrawArrays));
+            LoadFunction(out glDrawBuffer, nameof(glDrawBuffer));
             LoadFunction(out glDrawElements, nameof(glDrawElements));
             LoadFunction(out glEnable, nameof(glEnable));
             LoadFunction(out glEnableVertexAttribArray, nameof(glEnableVertexAttribArray));
             LoadFunction(out glFlush, nameof(glFlush));
+            LoadFunction(out glFramebufferTexture2D, nameof(glFramebufferTexture2D));
             LoadFunction(out glGenBuffers, nameof(glGenBuffers));
+            LoadFunction(out glGenFramebuffers, nameof(glGenFramebuffers));
             LoadFunction(out glGenerateMipmap, nameof(glGenerateMipmap));
             LoadFunction(out glGenTextures, nameof(glGenTextures));
             LoadFunction(out glGenVertexArrays, nameof(glGenVertexArrays));
@@ -51,6 +55,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             LoadFunction(out glGetShaderiv, nameof(glGetShaderiv));
             LoadFunction(out glGetUniformLocation, nameof(glGetUniformLocation));
             LoadFunction(out glLinkProgram, nameof(glLinkProgram));
+            LoadFunction(out glReadBuffer, nameof(glReadBuffer));
             LoadFunction(out glShaderSource, nameof(glShaderSource));
             LoadFunction(out glTexImage2D, nameof(glTexImage2D));
             LoadFunction(out glTexImage3D, nameof(glTexImage3D));
@@ -157,6 +162,19 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         internal static void BindBufferBase(BufferType target, uint index, uint buffer)
         {
             glBindBufferBase((uint)target, index, buffer);
+            CheckErrors();
+        }
+
+        #endregion
+
+        #region Bind Framebuffer
+
+        delegate void BindFramebufferDelegate(uint target, uint framebuffer);
+        static readonly BindFramebufferDelegate glBindFramebuffer;
+
+        internal static void BindFramebuffer(FramebufferType target, uint framebuffer)
+        {
+            glBindFramebuffer((uint)target, framebuffer);
             CheckErrors();
         }
 
@@ -382,6 +400,19 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 
         #endregion
 
+        #region Draw Buffer
+
+        delegate void DrawBufferDelegate(uint mode);
+        static readonly DrawBufferDelegate glDrawBuffer;
+
+        internal static void DrawBuffer(DrawBufferMode mode)
+        {
+            glDrawBuffer((uint)mode);
+            CheckErrors();
+        }
+
+        #endregion
+
         #region Draw Elements
 
         delegate void DrawElementsDelegate(uint mode, int count, uint type, int indices);
@@ -434,6 +465,19 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 
         #endregion
 
+        #region Framebuffer Texture 2D
+
+        delegate void FramebufferTexture2DDelegate(uint target, uint attachment, uint textarget, uint texture, int level);
+        static readonly FramebufferTexture2DDelegate glFramebufferTexture2D;
+
+        internal static void FramebufferTexture2D(FramebufferType target, FramebufferAttachment attachment, TextureType textarget, uint texture, int level)
+        {
+            glFramebufferTexture2D((uint)target, (uint)attachment, (uint)textarget, texture, level);
+            CheckErrors();
+        }
+
+        #endregion
+
         #region Gen Buffer
 
         delegate void GenBuffersDelegate(int n, ref uint buffers);
@@ -450,6 +494,21 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             glGenBuffers(1, ref buffer);
             CheckErrors();
             return buffer;
+        }
+
+        #endregion
+
+        #region Gen Framebuffer
+
+        delegate void GenFramebuffersDelegate(int n, ref uint framebuffers);
+        static readonly GenFramebuffersDelegate glGenFramebuffers;
+
+        internal static uint GenFramebuffer()
+        {
+            uint framebuffer = 0;
+            glGenFramebuffers(1, ref framebuffer);
+            CheckErrors();
+            return framebuffer;
         }
 
         #endregion
@@ -585,6 +644,19 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         internal static void LinkProgram(uint program)
         {
             glLinkProgram(program);
+            CheckErrors();
+        }
+
+        #endregion
+
+        #region Read Buffer
+
+        delegate void ReadBufferDelegate(uint mode);
+        static readonly ReadBufferDelegate glReadBuffer;
+
+        internal static void ReadBuffer(ReadBufferMode mode)
+        {
+            glReadBuffer((uint)mode);
             CheckErrors();
         }
 

@@ -29,6 +29,16 @@ namespace TerraWorldEnginePrototype.Core
 
             Scene.AddObject(cube2);
 
+            GameObject terrain = new GameObject(new TerrainMesh(1028, 1028))
+            {
+                Transform = new Transform()
+                {
+                    Position = new Vector3(-64, 10, -64)
+                }
+            };
+
+            Scene.AddObject(terrain);
+
             //TetrahedronObject tetrahedronObject = new TetrahedronObject(new Transform()
             //{
             //    Position = new Vector3(0, 2, 0),
@@ -46,14 +56,8 @@ namespace TerraWorldEnginePrototype.Core
 
             //Scene.AddObject(light);
 
-            PointLight pointLight = new PointLight(new Vector3(-10, 10, 0), Color.White, 1.0f);
+            PointLight pointLight = new PointLight(new Vector3(0, 20, 0), Color.White, 2.5f);
             Scene.AddObject(pointLight);
-
-            PointLight pointLight2 = new PointLight(new Vector3(10, 10, 0), Color.White, 1.0f);
-            Scene.AddObject(pointLight2);
-
-            PointLight pointLight3 = new PointLight(new Vector3(0, 10, 10), Color.White, 0.5f);
-            Scene.AddObject(pointLight3);
 
             base.OnLoad();
         }

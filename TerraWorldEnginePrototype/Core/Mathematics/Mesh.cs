@@ -129,4 +129,40 @@ namespace TerraWorldEnginePrototype.Core.Mathematics
             };
         }
     }
+
+    public class TerrainMesh : Mesh
+    {
+        public TerrainMesh(int width, int height)
+        {
+            var vertices = new Vector3[width * height];
+            var indices = new uint[(width - 1) * (height - 1) * 6];
+            var normals = new Vector3[width * height];
+
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    vertices[i * width + j] = new Vector3(i, 0, j);
+                    normals[i * width + j] = new Vector3(0, 1, 0);
+                }
+            }
+
+            for (int i = 0; i < width - 1; i++)
+            {
+                for (int j = 0; j < height - 1; j++)
+                {
+                    indices[(i * (width - 1) + j) * 6] = (uint)(i * width + j);
+                    indices[(i * (width - 1) + j) * 6 + 1] = (uint)(i * width + j + 1);
+                    indices[(i * (width - 1) + j) * 6 + 2] = (uint)((i + 1) * width + j + 1);
+                    indices[(i * (width - 1) + j) * 6 + 3] = (uint)(i * width + j);
+                    indices[(i * (width - 1) + j) * 6 + 4] = (uint)((i + 1) * width + j + 1);
+                    indices[(i * (width - 1) + j) * 6 + 5] = (uint)((i + 1) * width + j);
+                }
+            }
+
+            Vertices = vertices;
+            Indices = indices;
+            Normals = normals;
+        }
+    }
 }
