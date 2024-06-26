@@ -12,6 +12,9 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
     {
         #region Initialization
 
+        /// <summary>
+        /// Static constructor that initializes the OpenGL functions.
+        /// </summary>
         static GL()
         {
             GetProcAddress = GetProcAddressFunction();
@@ -32,6 +35,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             LoadFunction(out glCreateShader, nameof(glCreateShader));
             LoadFunction(out glCullFace, nameof(glCullFace));
             LoadFunction(out glDeleteBuffers, nameof(glDeleteBuffers));
+            LoadFunction(out glDeleteFramebuffers, nameof(glDeleteFramebuffers));
             LoadFunction(out glDeleteProgram, nameof(glDeleteProgram));
             LoadFunction(out glDeleteShader, nameof(glDeleteShader));
             LoadFunction(out glDeleteTextures, nameof(glDeleteTextures));
@@ -62,6 +66,7 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             LoadFunction(out glTexParameterf, nameof(glTexParameterf));
             LoadFunction(out glTexParameterfv, nameof(glTexParameterfv));
             LoadFunction(out glTexParameteri, nameof(glTexParameteri));
+            LoadFunction(out glTexParameteriv, nameof(glTexParameteriv));
             LoadFunction(out glTexSubImage2D, nameof(glTexSubImage2D));
             LoadFunction(out glUseProgram, nameof(glUseProgram));
             LoadFunction(out glUniform3f, nameof(glUniform3f));
@@ -69,7 +74,6 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
             LoadFunction(out glUniformMatrix4fv, nameof(glUniformMatrix4fv));
             LoadFunction(out glVertexAttribPointer, nameof(glVertexAttribPointer));
             LoadFunction(out glViewport, nameof(glViewport));
-
             LoadFunction(out glGetError, nameof(glGetError));
         }
 
@@ -330,6 +334,19 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
         public static void DeleteBuffer(uint buffer)
         {
             glDeleteBuffers(1, ref buffer);
+            CheckErrors();
+        }
+
+        #endregion
+
+        #region Delete Framebuffer
+
+        delegate void DeleteFramebufferDelegate(int n, ref uint framebuffers);
+        static readonly DeleteFramebufferDelegate glDeleteFramebuffers;
+
+        internal static void DeleteFramebuffer(uint framebuffer)
+        {
+            glDeleteFramebuffers(1, ref framebuffer);
             CheckErrors();
         }
 
@@ -693,12 +710,15 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 
         #region Texture Image 3D
 
-        delegate void TexImage3DDelegate(uint target, int level, int internalFormat, int width, int height, int depth, int border, uint format, uint type, float[] pixels);
+        unsafe delegate void TexImage3DDelegate(uint target, int level, int internalFormat, int width, int height, int depth, int border, uint format, uint type, void* pixels);
         static readonly TexImage3DDelegate glTexImage3D;
 
-        internal static void TexImage3D(TextureType target, int level, int internalFormat, int width, int height, int depth, int border, uint format, uint type, float[] pixels)
+        internal unsafe static void TexImage3D<T>(TextureType target, int level, PixelInternalFormat internalFormat, int width, int height, int depth, int border, PixelFormat format, PixelType type, T[] pixels) where T : unmanaged
         {
-            glTexImage3D((uint)target, level, internalFormat, width, height, depth, border, format, type, pixels);
+            fixed (T* pixelsPtr = pixels)
+            {
+                glTexImage3D((uint)target, level, (int)internalFormat, width, height, depth, border, (uint)format, (uint)type, pixelsPtr);
+            }
             CheckErrors();
         }
 
@@ -743,14 +763,30 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 
         #endregion
 
+        #region Texture Parameter Integer Vector
+
+        delegate void TexParameterivDelegate(uint target, uint pname, int[] param);
+        static readonly TexParameterivDelegate glTexParameteriv;
+
+        internal static void TexParameter(TextureType target, TextureParameterName pname, int[] param)
+        {
+            glTexParameteriv((uint)target, (uint)pname, param);
+            CheckErrors();
+        }
+
+        #endregion
+
         #region Texture Sub Image 2D
 
-        delegate void TexSubImage2DDelegate(uint target, int level, int xoffset, int yoffset, int width, int height, uint format, uint type, float[] pixels);
+        unsafe delegate void TexSubImage2DDelegate(uint target, int level, int xoffset, int yoffset, int width, int height, uint format, uint type, void* pixels);
         static readonly TexSubImage2DDelegate glTexSubImage2D;
 
-        internal static void TexSubImage2D(TextureType target, int level, int xoffset, int yoffset, int width, int height, uint format, uint type, float[] pixels)
+        internal unsafe static void TexSubImage2D<T>(TextureType target, int level, int xoffset, int yoffset, int width, int height, PixelFormat format, PixelType type, T[] pixels) where T : unmanaged
         {
-            glTexSubImage2D((uint)target, level, xoffset, yoffset, width, height, format, type, pixels);
+            fixed (T* pixelsPtr = pixels)
+            {
+                glTexSubImage2D((uint)target, level, xoffset, yoffset, width, height, (uint)format, (uint)type, pixelsPtr);
+            }
             CheckErrors();
         }
 
@@ -795,38 +831,26 @@ namespace TerraWorldEnginePrototype.PlatformIndependence.Rendering.OpenGL
 
         #endregion
 
-        #region Uniform Matrix 4 Float
+        #region Uniform Matrix 4 Float Vector
 
-        delegate void UniformMatrix4fvDelegate(int location, int count, bool transpose, float[] value);
+        unsafe delegate void UniformMatrix4fvDelegate(int location, int count, bool transpose, void* value);
         static readonly UniformMatrix4fvDelegate glUniformMatrix4fv;
 
-        internal static void UniformMatrix4(int location, bool transpose, ref Matrix4x4 value)
+        internal unsafe static void UniformMatrix4(int location, bool transpose, ref Matrix4x4 value)
         {
-            float[] matrix =
-            [
-                value.M11,
-                value.M12,
-                value.M13,
-                value.M14,
-                value.M21,
-                value.M22,
-                value.M23,
-                value.M24,
-                value.M31,
-                value.M32,
-                value.M33,
-                value.M34,
-                value.M41,
-                value.M42,
-                value.M43,
-                value.M44,
-            ];
-            glUniformMatrix4fv(location, 1, transpose, matrix);
+            fixed (Matrix4x4* valuePtr = &value)
+            {
+                glUniformMatrix4fv(location, 1, transpose, valuePtr);
+            }
+            CheckErrors();
         }
 
-        internal static void UniformMatrix4fv(int location, int count, bool transpose, float[] value)
+        internal unsafe static void UniformMatrix4fv(int location, int count, bool transpose, float[] value)
         {
-            glUniformMatrix4fv(location, count, transpose, value);
+            fixed (float* valuePtr = value)
+            {
+                glUniformMatrix4fv(location, count, transpose, valuePtr);
+            }
             CheckErrors();
         }
 

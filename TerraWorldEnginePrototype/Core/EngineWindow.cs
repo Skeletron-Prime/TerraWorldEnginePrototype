@@ -47,8 +47,8 @@ namespace TerraWorldEnginePrototype.Core
 
             //Scene.AddObject(tetrahedronObject);
 
-            Mesh mesh = MeshLoader.Load("E:\\Blender Models\\Monkey.obj");
-            GameObject monkey = new GameObject(mesh);
+            Mesh monkeyMesh = MeshLoader.Load("E:\\Blender Models\\Monkey.obj");
+            GameObject monkey = new GameObject(monkeyMesh);
 
             Scene.AddObject(monkey);
 
